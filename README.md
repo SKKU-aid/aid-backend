@@ -1,5 +1,9 @@
 # 스꾸장학비서
 
+## Overview
+TBD
+
+## License
 TBD
 
 ## Contributers
@@ -8,6 +12,9 @@ TBD
 
 ### Frontend
 
+TBD
+
+<!--
 <table>
   <tr>
     <td align="center">
@@ -40,6 +47,7 @@ TBD
     </td>
   </tr>
 </table>
+-->
 
 ### Backend
 
