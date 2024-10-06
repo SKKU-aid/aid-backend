@@ -54,14 +54,14 @@ TBD
     </td>
     <td align="center">
       <a href="https://github.com/kdonghyun13">
-        <img src="https://github.comkdonghyun13.png" width="60px;" alt="kdonghyun13"/>
+        <img src="https://github.com/kdonghyun13.png" width="60px;" alt="kdonghyun13"/>
         <br />
         <sub><b>Donghyun Kim</b></sub>
       </a>
     </td>
     <td align="center">
       <a href="https://github.com/ohsj3781">
-        <img src="https://github.com/ohsj3781" width="60px;" alt="ohsj3781"/>
+        <img src="https://github.com/ohsj3781.png" width="60px;" alt="ohsj3781"/>
         <br />
         <sub><b>Seungjae Oh</b></sub>
       </a>
