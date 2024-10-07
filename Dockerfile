@@ -1,7 +1,7 @@
-#Written By: Oh Seung Jae
-#Type the following command to build the image:
+# Written By: Oh Seung Jae
+# Type the following command to build the image:
 # docker build -t swe_ubuntu_image .
-# docker run -i -t --name swe_ubuntu_container swe_ubuntu_image
+# docker run -it -v $(pwd):/app --name swe_ubuntu_container swe_ubuntu_image
 
 FROM ubuntu:24.04
 WORKDIR /usr/local/app
@@ -11,7 +11,7 @@ RUN rm -rf /var/lib/apt/lists/* && \
     apt-get update && \
     apt-get upgrade -y
 
-# Update and install necessary packages
+# Install necessary packages
 RUN apt-get install -y \
     software-properties-common \
     curl \
@@ -23,10 +23,11 @@ RUN apt-get install -y \
     gcc \
     g++ \
     python3 \
-    python3-pip
+    python3-pip \
+    vim
 
-RUN apt-get update && apt-get -y upgrade
-
+# Install LangChain globally using --break-system-packages
+RUN pip install --break-system-packages langchain==0.3.2
 
 # Install Node.js and npm
 ENV NVM_DIR=/root/.nvm
@@ -43,13 +44,16 @@ WORKDIR /app
 
 # Install MongoDB
 RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
- gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
---dearmor
-RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
-RUN apt-get update
-RUN apt-get install -y mongodb-org
+    gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
 
+RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+RUN apt-get update && apt-get install -y mongodb-org
+
+# Create MongoDB data directory
+RUN mkdir -p /data/db
 
 # Default command to keep the container running
 CMD ["bash"]
+
+# Use bash as the default shell
 SHELL ["/bin/bash", "-c"]
