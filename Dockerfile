@@ -1,7 +1,7 @@
 # Written By: Oh Seung Jae
 # Type the following command to build the image:
 # docker build -t ssa_image .
-# docker run -it -v "$(pwd)":/app --name ssa_container ssa_image
+# docker run -it -v "$(pwd):/app" --name ssa_container ssa_image
 
 FROM ubuntu:24.04
 WORKDIR /usr/local/app
