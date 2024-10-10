@@ -20,6 +20,12 @@ docker run ssa_container
 docker exec -it ssa_container bash
 ```
 
+mongodb with local host
+```bash
+docker-compose up -d
+```
+http://localhost:8081
+
 TBD
 
 ## License

@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:4.4.3
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1398
+      MONGO_INITDB_DATABASE: auth
+    volumes:
+      - db:/data/db
+
+  mongo-express:
+    image: mongo-express:0.54.0
+    container_name: mongo-express
+    restart: always
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 1398
+      ME_CONFIG_MONGODB_SEVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: 1398
+    depends_on:
+      - mongodb
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test_container
+    ports:
+      - 8080:8080
+    volumes:
+      - backend:/usr
+  
+volumes:
+  db:
+  backend:
