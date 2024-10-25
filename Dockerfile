@@ -33,15 +33,19 @@ RUN python3 -m venv /usr/local/app/venv
 # Activate the virtual environment and install LangChain and Scrapy
 RUN /usr/local/app/venv/bin/pip install langchain==0.3.2 scrapy
 
-# Install Node.js and npm
-ENV NVM_DIR=/root/.nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
-    . $NVM_DIR/nvm.sh && \
-    nvm install 22 && \
-    nvm alias default 22 && \
-    ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/node" /usr/bin/node && \
-    ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/npm" /usr/bin/npm && \
-    ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/npx" /usr/bin/npx
+# # Install Node.js and npm
+# ENV NVM_DIR=/root/.nvm
+# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
+#     . $NVM_DIR/nvm.sh && \
+#     nvm install 22 && \
+#     nvm alias default 22 && \
+#     ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/node" /usr/bin/node && \
+#     ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/npm" /usr/bin/npm && \
+#     ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/npx" /usr/bin/npx
+
+# Install Node.js and npm using NodeSource
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
 
 # Set up working directory
 WORKDIR /app
