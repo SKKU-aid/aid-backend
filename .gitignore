@@ -1,7 +1,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,visualstudio,react,reactnative,node,java,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,visualstudio,react,reactnative,node,java,python
 
-Backend/skku_notice/*.json
+skku_notice/*.json
 
 ### Java ###
 # Compiled class file

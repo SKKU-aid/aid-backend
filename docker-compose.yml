@@ -31,12 +31,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: test_container
+    image: aid-backend-image
+    container_name: backend
     ports:
-      - 8080:8080
+      - 8082:8082
     volumes:
-      - backend:/usr
-  
+      - .:/app
+    tty: true
+    
 volumes:
   db:
   backend:
