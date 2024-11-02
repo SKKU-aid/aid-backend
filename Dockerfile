@@ -2,7 +2,8 @@ FROM ubuntu:24.04
 WORKDIR /usr/local/app
 
 # Clear apt-get cache and update package lists
-RUN apt-get update && \
+RUN rm -rf /var/lib/apt/lists/* && \
+    apt-get update && \
     apt-get upgrade -y
 
 # Install necessary packages
