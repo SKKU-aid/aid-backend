@@ -26,17 +26,16 @@ RUN apt-get install -y \
 RUN python3 -m venv /usr/local/app/venv
 
 # Activate the virtual environment and install LangChain and Scrapy
-RUN /usr/local/app/venv/bin/pip install langchain==0.3.2 scrapy
-
+RUN /usr/local/app/venv/bin/pip install \ 
+    scrapy pymongo langchain==0.3.2 langchain_openai python-dotenv \
+    langchain_teddynote langchain_core
+    
 # Install Node.js and npm using NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 # Set up working directory
 WORKDIR /app
-
-# Install express in working directory using npm
-RUN npm install express
 
 # Install MongoDB
 RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
@@ -54,6 +53,3 @@ RUN echo "source /usr/local/app/venv/bin/activate" >> ~/.bashrc
 
 # Use bash as the default shell
 SHELL ["/bin/bash", "-c"]
-
-# # Start a bash shell when the container starts
-# CMD ["bash", "-c", "exec sh"]
