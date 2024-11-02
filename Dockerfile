@@ -35,6 +35,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 # Set up working directory
 WORKDIR /app
 
+# Install express in working directory using npm
+RUN npm install express
+
 # Install MongoDB
 RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
     gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
