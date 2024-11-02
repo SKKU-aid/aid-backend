@@ -7,13 +7,13 @@ services:
     image: aid-backend-image
     container_name: backend
     ports:
-      - 8082:8082
+      - 8080:8080
     volumes:
       - .:/app
     tty: true
     environment:
       MONGO_URI: "${MONGO_URI}"
-
+    
   mongo-express:
     image: mongo-express:0.54.0
     container_name: mongo-express
@@ -22,6 +22,18 @@ services:
       - 8081:8081
     environment:
       ME_CONFIG_MONGODB_URI: "${MONGO_URI}"
-          
-volumes:
-  backend:
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aid-backend-image
+    container_name: jupyter
+    ports:
+      - 8888:8888
+    volumes:
+      - .:/app
+    tty: true
+    environment:
+      MONGO_URI: "${MONGO_URI}"
+    command: /bin/bash -c "source /usr/local/app/venv/bin/activate && jupyter notebook --ip=0.0.0.0 --no-browser --allow-root"

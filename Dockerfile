@@ -26,9 +26,8 @@ RUN apt-get install -y \
 RUN python3 -m venv /usr/local/app/venv
 
 # Activate the virtual environment and install LangChain and Scrapy
-RUN /usr/local/app/venv/bin/pip install \ 
-    scrapy pymongo langchain==0.3.2 langchain_openai python-dotenv \
-    langchain_teddynote langchain_core
+RUN /usr/local/app/venv/bin/pip install scrapy pymongo langchain==0.3.2 \
+    langchain_openai python-dotenv langchain_teddynote langchain_core jupyter
     
 # Install Node.js and npm using NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
