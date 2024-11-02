@@ -27,11 +27,13 @@ class SkkuNoticeSpider(scrapy.Spider):
     def parse_notice(self, response):
         title = response.css('em.ellipsis::text').get(default='Title not found').strip()
         content = response.css('pre.pre::text').get(default='Content not found').replace('\r\n', ' ').strip()
+        start_date = response.css('span.date::text').get(default='Start date not found').strip()
         views = response.meta.get('views', 'Views not found')
 
         yield {
             'title': title,
             'link': response.url,
+            'start_date': start_date,
             'views': views,
             'content': content
         }
