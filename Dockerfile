@@ -2,8 +2,7 @@ FROM ubuntu:24.04
 WORKDIR /usr/local/app
 
 # Clear apt-get cache and update package lists
-RUN rm -rf /var/lib/apt/lists/* && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get upgrade -y
 
 # Install necessary packages
@@ -34,6 +33,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 
 # Set up working directory
 WORKDIR /app
+
+# Install express in working directory using npm
+RUN npm install express
 
 # Install MongoDB
 RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
