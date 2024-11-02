@@ -9,13 +9,14 @@ class SkkuNoticeSpider(scrapy.Spider):
 
     def parse(self, response):
         links = response.css('dt.board-list-content-title a::attr(href)').getall()
-        for link in links:
+        views = response.css('span.board-mg-l10::text').getall()
+        for i, link in enumerate(links):
             if self.notice_count < self.max_notices:
                 full_link = response.urljoin(link)
                 self.notice_count += 1
-                yield response.follow(full_link, callback=self.parse_notice)
+                yield response.follow(full_link, callback=self.parse_notice, meta={'views': views[i]})
             else:
-                break  # Stop further processing if the limit is reached
+                break
 
         # Handle pagination only if the max notices limit hasn't been reached
         if self.notice_count < self.max_notices:
@@ -26,8 +27,11 @@ class SkkuNoticeSpider(scrapy.Spider):
     def parse_notice(self, response):
         title = response.css('em.ellipsis::text').get(default='Title not found').strip()
         content = response.css('pre.pre::text').get(default='Content not found').replace('\r\n', ' ').strip()
+        views = response.meta.get('views', 'Views not found')
+
         yield {
             'title': title,
             'link': response.url,
+            'views': views,
             'content': content
         }
