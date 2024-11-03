@@ -44,7 +44,8 @@ RUN apt-get update
 RUN apt-get install -y mongodb-org
 
 # Install Node.js dependencies (express and mongoose)
-RUN npm install express mongoose
+COPY package*.json ./
+RUN npm install
 
 # Create MongoDB data directory
 RUN mkdir -p /data/db
@@ -54,6 +55,3 @@ RUN echo "source /usr/local/app/venv/bin/activate" >> ~/.bashrc
 
 # Use bash as the default shell
 SHELL ["/bin/bash", "-c"]
-
-# # Start a bash shell when the container starts
-# CMD ["bash", "-c", "exec sh"]
