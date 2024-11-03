@@ -23,7 +23,6 @@ docker exec -it ssa_container bash
 mongodb with local host
 ```bash
 docker-compose up -d
-docker exec -it backend bash
 ```
 http://localhost:8081
 
