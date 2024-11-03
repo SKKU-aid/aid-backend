@@ -95,7 +95,7 @@ router.get('/:userID/scholarships', async (req, res) => {
     const userID = req.params.userID; // Extract userID from the route parameter
     const type = req.query.type;
     if (type != "custom") {
-        res.status(500).json(createResponse(false, "type is not custom", null));
+        return res.status(500).json(createResponse(false, "type is not custom", null));
     }
     console.log('User ID:', userID); // For debugging
 

@@ -1,24 +1,24 @@
 const mongoose = require('mongoose');
 
 const scholarshipSchema = new mongoose.Schema({
-    _id: { type: Number, unique: true },
-    scholarshipName: { type: String },
-    eligibleMajors: { type: [String] },
-    minimumGPARequirement: { type: Number },
-    eligibleSemesters: { type: [Number] },
-    scholarshipType: { type: String },
-    ageLimit: { type: Number, default: null },
-    regionalRestrictions: { type: [String] },
-    incomeLevelRequirement: { type: Number },
-    applicationPeriod: { type: String },
-    scholarshipAmount: { type: Number },
-    numberOfRecipients: { type: Number },
-    requiredDocuments: { type: [String] },
-    applicationMethod: { type: String },
-    significant: { type: String, default: null },
-    link: { type: String },
-    views: { type: Number, default: 0 },
-    foundation: { type: String }
+    _id: { type: Number, required: true, unique: true },
+    scholarshipName: { type: String, required: true },
+    eligibleMajors: { type: [String], required: true, default: [] },
+    minimumGPARequirement: { type: Number, required: true, default: null },
+    eligibleSemesters: { type: [Number], required: true },
+    scholarshipType: { type: String, required: true },
+    ageLimit: { type: Number, required: true, default: null },
+    regionalRestrictions: { type: [String], required: true },
+    incomeLevelRequirement: { type: Number, required: true, default: null },
+    applicationPeriod: { type: String, required: true },
+    scholarshipAmount: { type: Number, required: true },
+    numberOfRecipients: { type: Number, required: true },
+    requiredDocuments: { type: [String], required: true },
+    applicationMethod: { type: String, required: true },
+    significant: { type: String, required: true, default: null },
+    link: { type: String, required: true },
+    views: { type: Number, required: true, default: 0 },
+    foundation: { type: String, required: true }
 });
 
 module.exports = mongoose.model('Scholarships', scholarshipSchema, 'scholarships');

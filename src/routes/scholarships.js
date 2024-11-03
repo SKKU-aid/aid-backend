@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     const userID = req.query.userID;
 
     try {
-        const user = await User.findOne({ userID: userID }, 'savedScholarship');
+        const user = await User.findOne({  userID: userID }, 'savedScholarship');
         if (!user) {
             return res.status(404).json(createResponse(false, "User not found", null));
         }
@@ -89,7 +89,7 @@ router.get('/:scholarshipID', async (req, res) => {
         };
 
         // Directly return the compact scholarship data
-        res.status(200).json(compactScholarship);
+        res.status(200).json(createResponse(true,"Succes to get data",compactScholarship));
     } catch (error) {
         console.error('Error retrieving scholarship:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarship", null));
