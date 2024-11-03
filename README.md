@@ -44,7 +44,7 @@ TBD
 ## How to Run test APIserver and DB server
 1. Run "skku_scholarship_assistant" using docker
 2. Run "docker exec -it backend bash" in terminal
-3. Type node app.js it run APIserver
+3. Type "node app.js" run APIserver
 4. Connect localhost:8081 using webBrowser ID:root, PW:1398
 5. Create 'auth' Database and create 'user','scholarships' collections in 'auth' database
 6. Copy and Paste data in testData dir
