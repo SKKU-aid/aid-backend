@@ -43,6 +43,9 @@ RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.
 RUN apt-get update
 RUN apt-get install -y mongodb-org
 
+# Install Node.js dependencies (express and mongoose)
+RUN npm install express mongoose
+
 # Create MongoDB data directory
 RUN mkdir -p /data/db
 
