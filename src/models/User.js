@@ -13,7 +13,7 @@ const UserSchema = mongoose.Schema(
         lastGPA: { type: Number, required: true },
         incomeLevel: { type: Number, required: true },
         region: { type: String, required: true },
-        saved_scholarship: {
+        savedScholarship: {
             type: [{ type: Number }], required: true, default: []
         }
     }

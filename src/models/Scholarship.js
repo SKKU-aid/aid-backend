@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const scholarshipSchema = new mongoose.Schema({
-    scholarshipID: { type: Number, unique: true },
+    _id: { type: Number, unique: true },
     scholarshipName: { type: String },
     eligibleMajors: { type: [String] },
     minimumGPARequirement: { type: Number },
     eligibleSemesters: { type: [Number] },
     scholarshipType: { type: String },
-    ageLimit: { type: Number },
+    ageLimit: { type: Number, default: null },
     regionalRestrictions: { type: [String] },
     incomeLevelRequirement: { type: Number },
     applicationPeriod: { type: String },
@@ -15,7 +15,7 @@ const scholarshipSchema = new mongoose.Schema({
     numberOfRecipients: { type: Number },
     requiredDocuments: { type: [String] },
     applicationMethod: { type: String },
-    significant: { type: String },
+    significant: { type: String, default: null },
     link: { type: String },
     views: { type: Number, default: 0 },
     foundation: { type: String }
