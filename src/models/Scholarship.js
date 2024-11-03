@@ -11,7 +11,7 @@ const scholarshipSchema = new mongoose.Schema({
     regionalRestrictions: { type: [String], required: true },
     incomeLevelRequirement: { type: Number, required: true, default: null },
     applicationPeriod: { type: String, required: true },
-    scholarshipAmount: { type: Number, required: true },
+    scholarshipAmount: { type: String, required: true, default: null },
     numberOfRecipients: { type: Number, required: true },
     requiredDocuments: { type: [String], required: true },
     applicationMethod: { type: String, required: true },
