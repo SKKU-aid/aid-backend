@@ -48,6 +48,7 @@ TBD
 4. Connect localhost:8081 using webBrowser ID:root, PW:1398
 5. Create 'auth' Database and create 'user','scholarships' collections in 'auth' database
 6. Copy and Paste data in testData dir
+7. Connect locaslhost:8082 using webBrowser 
 
 ## License
 
