@@ -41,14 +41,27 @@ http://localhost:8081
 
 TBD
 
-## How to Run test APIserver and DB server
-1. Run "skku_scholarship_assistant" using docker
-2. Run "docker exec -it backend bash" in terminal
-3. Type "node app.js" run APIserver
-4. Connect localhost:8081 using webBrowser ID:root, PW:1398
-5. Create 'auth' Database and create 'user','scholarships' collections in 'auth' database
-6. Copy and Paste data in testData dir
-7. Connect locaslhost:8082 using webBrowser 
+### How to Run the Test API Server and Database Server
+
+Follow these steps to set up and run the API and MongoDB servers in Docker.
+
+1. Open a terminal in the project directory and run the following command to start all containers in the background:
+    ```bash
+    docker exec -it backend bash
+    ```
+
+2. Install Dependencies in the Backend Container
+    ```bash
+    docker exec -it backend bash
+    npm install
+    ```
+
+3. Start the API Server. In the backend container, start the API server by running:
+    ```bash
+    node app.js
+    ```
+
+4. Once the API server is running, you can access it at [http://localhost:8082](http://localhost:8082) in your web browser.
 
 ## License
 
