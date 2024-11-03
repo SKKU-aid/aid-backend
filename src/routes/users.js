@@ -5,6 +5,7 @@ const User = require("../models/User.js")
 const Scholarship = require('../models/Scholarship.js');
 const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
+const { findByIdAndUpdate } = require('../models/CompactScholarship.js');
 
 // getUserInfo
 router.get('/:userID', async (req, res) => {
@@ -30,22 +31,10 @@ router.get('/:userID', async (req, res) => {
 
 // updateUserInfo
 router.put('/:userID/update-info', async (req, res) => {
-    try {
-        // Extract user info from the route parameter
-        const {
-            userID,
-            sex,
-            birthday,
-            major,
-            currentSemester,
-            currentStatus,
-            totalGPA,
-            lastGPA,
-            incomeLevel,
-            region
-        } = req.body;
-        console.log('User ID:', userID); // For debugging
+    const userID = req.params.userID; // Extract userID from the route parameter
+    console.log('User ID:', userID); // For debugging
 
+    try {
         // Retrieve user with necessary fields
         const user = await User.findOne({ userID: userID });
 
@@ -164,5 +153,69 @@ router.get('/:userID/fav-scholarships', async (req, res) => {
         console.error('Error retrieving favorite scholarships:', error);
         res.status(500).json(createResponse(false, "관심장학을 불러오는데 실패 했습니다", null));
     }
-})
+});
+
+//addSavedScholarship
+router.post('/:userID/fav-scholarships', async (req, res) => {
+    try {
+        const {
+            userID,
+            scholarshipID
+        } = req.body;
+        // Retrieve the user and their saved scholarships
+        const user = await User.findOne({ userID }, 'savedScholarship');
+        if (!user) {
+            return res.status(404).json(createResponse(false, "User not found", null));
+        }
+
+        // Check if the user has any saved scholarships
+        const savedScholarshipIDs = user.savedScholarship || [];
+
+        if (savedScholarshipIDs.includes(scholarshipID)) {
+            return res.status(404).json(createResponse(false, "Favorite scholarship already exists", null));
+        }
+        savedScholarshipIDs.push(scholarshipID);
+        
+        console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
+        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+
+        res.status(200).json(createResponse(true, "Favorite scholarships has been successfully deleted", null));
+    } catch (error) {
+        console.error('Error add favorite scholarships:', error);
+        res.status(500).json(createResponse(false, "Failed to add favorite scholarships", null));
+    }
+});
+
+//deleteSavedScholarship
+router.delete('/:userID/fav-scholarships', async (req, res) => {
+    try {
+        const {
+            userID,
+            scholarshipID
+        } = req.body;
+        // Retrieve the user and their saved scholarships
+        const user = await User.findOne({ userID }, 'savedScholarship');
+        if (!user) {
+            return res.status(404).json(createResponse(false, "User not found", null));
+        }
+
+        // Check if the user has any saved scholarships
+        const savedScholarshipIDs = user.savedScholarship || [];
+
+        const index = savedScholarshipIDs.indexOf(scholarshipID);
+        if (index == -1) {
+            return res.status(404).json(createResponse(false, "Favorite scholarship does not exit", null));
+        }
+        savedScholarshipIDs.splice(index, 1);
+
+        console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
+        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+
+        res.status(200).json(createResponse(true, "Favorite scholarships has been successfully added", null));
+    } catch (error) {
+        console.error('Error add favorite scholarships:', error);
+        res.status(500).json(createResponse(false, "Failed to add favorite scholarships", null));
+    }
+});
+
 module.exports = router;

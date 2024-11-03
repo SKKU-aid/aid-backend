@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         return res.status(200).json(createResponse(true, "User has been successfully registered", null));
     } catch (error) {
         console.error('Error register user:', error);
-        return res.status(400).json(createResponse(false, "Failed to register", null));
+        return res.status(500).json(createResponse(false, "Failed to register", null));
     }
 });
 
@@ -33,11 +33,10 @@ router.get('/checkID', async (req, res) => {
         
         const user = await User.findOne({ userID: userID });
 
-        if (!user) {
-            return res.status(200).json(createResponse(true, "This userID is available", user));
+        if (user !== null) {
+            return res.status(400).json(createResponse(false, "This userID already exists", null));
         }
-        
-        res.status(400).json(createResponse(false, "This userID already exists", null));
+        res.status(200).json(createResponse(true, "This userID is available", user));
     } catch (error) {
         console.error('Error retrieve user:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve userID", null));
