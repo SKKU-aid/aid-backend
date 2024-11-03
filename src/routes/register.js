@@ -34,7 +34,7 @@ router.get('/checkID', async (req, res) => {
         const user = await User.findOne({ userID: userID });
 
         if (user !== null) {
-            return res.status(400).json(createResponse(false, "This userID already exists", null));
+            return res.status(404).json(createResponse(false, "This userID already exists", null));
         }
         res.status(200).json(createResponse(true, "This userID is available", user));
     } catch (error) {
