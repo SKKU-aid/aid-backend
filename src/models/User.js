@@ -6,12 +6,12 @@ const UserSchema = mongoose.Schema(
         userPassword: { type: String, required: true },
         sex: { type: Boolean, required: true },
         birthday: { type: Date, required: true },
-        major: { type: String, required: true },
         currentSemester: { type: Number, required: true },
         currentStatus: { type: String, required: true },
         totalGPA: { type: Number, required: true },
         lastGPA: { type: Number, required: true },
         incomeLevel: { type: Number, required: true },
+        major: { type: String, required: true },
         region: { type: String, required: true },
         savedScholarship: {
             type: [{ type: Number }], required: true, default: []
