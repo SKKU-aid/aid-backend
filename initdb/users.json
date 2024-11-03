@@ -1,7 +1,6 @@
 [
     {
-        "_id": "672611a7660b2554923de0b8",
-        "userID": "example@skku.edu",
+        "_id": "example@skku.edu",
         "userPassword": "1398",
         "sex": true,
         "birthday": "2000-01-01T00: 00: 00.000+00: 00",

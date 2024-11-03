@@ -11,6 +11,7 @@ services:
       MONGO_INITDB_DATABASE: auth
     volumes:
       - db:/data/db
+      - ./initdb:/docker-entrypoint-initdb.d
 
   mongo-express:
     image: mongo-express:0.54.0

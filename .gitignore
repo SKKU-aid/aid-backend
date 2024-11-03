@@ -2,6 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,visualstudio,react,reactnative,node,java,python
 
 skku_notice/*.json
+package.json
+package-lock.json
 
 ### Java ###
 # Compiled class file
