@@ -16,12 +16,13 @@ mongoose.connect(mongoURI)
 const userRoutes = require('./src/routes/users');
 const scholarshipRoutes = require('./src/routes/scholarships');
 const login=require('./src/routes/login');
+const register=require('./src/routes/register');
 
 // Use routes
 app.use('/users', userRoutes);
 app.use('/scholarships', scholarshipRoutes);
-app.use('/login',login);
-
+app.use('/login', login);
+app.use('/register', register);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

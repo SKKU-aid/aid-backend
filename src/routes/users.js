@@ -6,6 +6,100 @@ const Scholarship = require('../models/Scholarship.js');
 const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
 
+// getUserInfo
+router.get('/:userID', async (req, res) => {
+    const userID = req.params.userID; // Extract userID from the route parameter
+    console.log('User ID:', userID); // For debugging
+
+    try {
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+        
+        res.status(200).json(createResponse(true, "user information has been successfully retrieved", user));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+// updateUserInfo
+router.put('/:userID/update-info', async (req, res) => {
+    try {
+        // Extract user info from the route parameter
+        const {
+            userID,
+            sex,
+            birthday,
+            major,
+            currentSemester,
+            currentStatus,
+            totalGPA,
+            lastGPA,
+            incomeLevel,
+            region
+        } = req.body;
+        console.log('User ID:', userID); // For debugging
+
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+        
+        await User.findOneAndUpdate({ userID: userID }, req.body);
+
+        res.status(200).json(createResponse(true, "user information has been successfully updated", req.body));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+// updateUserInfo
+router.put('/:userID/update-pw', async (req, res) => {
+    try {
+        // Extract user info from the route parameter
+        const {
+            userID,
+            currentPassword,
+            updatePassword
+        } = req.body;
+        console.log('User ID:', userID); // For debugging
+
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+        
+        if (user.userPassword != currentPassword) {
+            console.error(`wrong password`);
+            return res.status(404).json(createResponse(false, "Wrong password", null));
+        }
+
+
+        await User.findOneAndUpdate({ userID: userID }, {userPassword: updatePassword});
+
+        res.status(200).json(createResponse(true, "user password has been successfully updated", null));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+
 //It return data right form
 // getRecommandedScholarshipInfo
 router.get('/:userID/scholarships', async (req, res) => {
