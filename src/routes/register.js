@@ -28,7 +28,7 @@ router.get('/checkID', async (req, res) => {
         console.log('User ID:', userID); // For debugging
 
         if (!userID) {
-            return res.status(400).json(createResponse(false, "userID is empty", null));
+            return res.status(404).json(createResponse(false, "userID is empty", null));
         }
         
         const user = await User.findOne({ userID: userID });
