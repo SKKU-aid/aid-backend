@@ -1,27 +1,148 @@
 db = db.getSiblingDB('auth');
 
 const usersData = [
-    {
-        "_id": "example@skku.edu",
-        "userPassword": "1398",
-        "sex": true,
-        "birthday": "2000-01-01T00: 00: 00.000+00: 00",
-        "currentSemester": 6,
-        "currentStatus": 1,
-        "incomeLevel": 1,
-        "lastGPA": 4.5,
-        "major": "경영",
-        "region": "수원시",
-        "totalGPA": 4.5,
-        "savedScholarship": [
-            1,
-            2,
-            3,
-            4,
-            5
-        ]
-    }
+  {
+      "userID": "example1@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "2001-01-01",
+      "currentSemester": 4,
+      "currentStatus": "재학",
+      "incomeLevel": 3,
+      "lastGPA": 4.0,
+      "totalGPA": 3.8,
+      "major": "소프트웨어학과",
+      "region": "서울",
+      "savedScholarship": [1, 3, 10]
+  },
+  {
+      "userID": "example2@skku.edu",
+      "userPassword": "1398",
+      "sex": false,
+      "birthday": "1999-02-15",
+      "currentSemester": 9,
+      "currentStatus": "휴학",
+      "incomeLevel": 0,
+      "lastGPA": 3.7,
+      "totalGPA": 3.5,
+      "major": "경영학과",
+      "region": "경기도",
+      "savedScholarship": [5, 12, 19]
+  },
+  {
+      "userID": "example3@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "2000-05-21",
+      "currentSemester": 6,
+      "currentStatus": "수료",
+      "incomeLevel": 2,
+      "lastGPA": 4.2,
+      "totalGPA": 3.9,
+      "major": "전자전기공학과",
+      "region": "부산",
+      "savedScholarship": [9, 15, 21]
+  },
+  {
+      "userID": "example4@skku.edu",
+      "userPassword": "1398",
+      "sex": false,
+      "birthday": "2002-08-10",
+      "currentSemester": 2,
+      "currentStatus": "재학",
+      "incomeLevel": 5,
+      "lastGPA": 3.5,
+      "totalGPA": 3.2,
+      "major": "화학공학과",
+      "region": "광주",
+      "savedScholarship": [2, 17, 28]
+  },
+  {
+      "userID": "example5@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "2001-04-03",
+      "currentSemester": 5,
+      "currentStatus": "재학",
+      "incomeLevel": 7,
+      "lastGPA": 3.9,
+      "totalGPA": 3.7,
+      "major": "경제학과",
+      "region": "인천",
+      "savedScholarship": [3, 11, 25]
+  },
+  {
+      "userID": "example6@skku.edu",
+      "userPassword": "1398",
+      "sex": false,
+      "birthday": "2000-11-27",
+      "currentSemester": 7,
+      "currentStatus": "재학",
+      "incomeLevel": 2,
+      "lastGPA": 4.3,
+      "totalGPA": 3.9,
+      "major": "건축학과",
+      "region": "대전",
+      "savedScholarship": [8, 16, 27]
+  },
+  {
+      "userID": "example7@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "1998-03-22",
+      "currentSemester": 9,
+      "currentStatus": "휴학",
+      "incomeLevel": 1,
+      "lastGPA": 3.4,
+      "totalGPA": 3.6,
+      "major": "물리학과",
+      "region": "울산",
+      "savedScholarship": [4, 18, 29]
+  },
+  {
+      "userID": "example8@skku.edu",
+      "userPassword": "1398",
+      "sex": false,
+      "birthday": "1999-07-30",
+      "currentSemester": 8,
+      "currentStatus": "재학",
+      "incomeLevel": 4,
+      "lastGPA": 3.8,
+      "totalGPA": 3.6,
+      "major": "화학과",
+      "region": "강원도",
+      "savedScholarship": [13, 19, 24]
+  },
+  {
+      "userID": "example9@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "2000-10-12",
+      "currentSemester": 3,
+      "currentStatus": "재학",
+      "incomeLevel": 8,
+      "lastGPA": 4.1,
+      "totalGPA": 3.8,
+      "major": "컴퓨터공학과",
+      "region": "충청남도",
+      "savedScholarship": [5, 14, 20]
+  },
+  {
+      "userID": "example10@skku.edu",
+      "userPassword": "1398",
+      "sex": true,
+      "birthday": "2002-01-18",
+      "currentSemester": 1,
+      "currentStatus": "재학",
+      "incomeLevel": 6,
+      "lastGPA": 3.6,
+      "totalGPA": 3.5,
+      "major": "영문학과",
+      "region": "대구",
+      "savedScholarship": [6, 22, 26]
+  }
 ]
+
 
 const scholarshipsData = [
     {
