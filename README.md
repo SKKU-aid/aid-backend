@@ -1,3 +1,4 @@
+
 # 스꾸장학비서
 
 ## Overview
@@ -6,27 +7,14 @@ TBD
 
 ## How to Run
 
-<!-- ```bash
-git clone https://github.com/JihunSKKU/skku_scholarship_assistant.git
-cd skku_scholarship_assistant
-docker build -t ssa_image .
-docker run -it -v "$(pwd):/app" --name ssa_container ssa_image
-```
-
-OR if the Docker image and container have already been created:
-
-```bash
-docker run ssa_container
-docker exec -it ssa_container bash
-``` -->
-
 mongodb with local host
 ```bash
 docker-compose up -d
+docker exec -it backend bash
 ```
 http://localhost:8081
 
-### How to Use Scrapy in This Project
+### How to Use Scrapy (scrap)
 
 1. Open `.\skku_notice\skku_notice\spiders\skku_notice_spider.py`.
 2. Set the `start_urls` variable to the domain you want to scrape.
@@ -38,29 +26,14 @@ http://localhost:8081
     ```
 5. The scraped results will be stored in notices.json.
 
-TBD
-
-### How to Run the Test API Server and Database Server
-
-Follow these steps to set up and run the API and MongoDB servers in Docker.
-
-1. Open a terminal in the project directory and run the following command to start all containers in the background:
+### How to Use LangChain for Parsing
+1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.
+2. Start the Jupyter Notebook server and navigate to the following script:
     ```bash
-    docker exec -it backend bash
+    jupyter notebook /skku_notice/parsing/langchain_script.ipynb
+    Open the langchain_script.ipynb notebook to initiate the parsing process.
     ```
-
-2. Install Dependencies in the Backend Container
-    ```bash
-    docker exec -it backend bash
-    npm install
-    ```
-
-3. Start the API Server. In the backend container, start the API server by running:
-    ```bash
-    node app.js
-    ```
-
-4. Once the API server is running, you can access it at [http://localhost:8082](http://localhost:8082) in your web browser.
+3. Run each cell in the notebook to process and structure the scraped data into a MongoDB-compatible JSON format.
 
 ## License
 

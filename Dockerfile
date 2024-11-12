@@ -1,3 +1,4 @@
+
 FROM ubuntu:24.04
 WORKDIR /usr/local/app
 
@@ -26,8 +27,9 @@ RUN apt-get install -y \
 RUN python3 -m venv /usr/local/app/venv
 
 # Activate the virtual environment and install LangChain and Scrapy
-RUN /usr/local/app/venv/bin/pip install langchain==0.3.2 scrapy
-
+RUN /usr/local/app/venv/bin/pip install scrapy pymongo langchain==0.3.2 \
+    langchain_openai python-dotenv langchain_teddynote langchain_core jupyter
+    
 # Install Node.js and npm using NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
@@ -42,10 +44,6 @@ RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
 RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 RUN apt-get update
 RUN apt-get install -y mongodb-org
-
-# Install Node.js dependencies (express and mongoose)
-COPY package*.json ./
-RUN npm install
 
 # Create MongoDB data directory
 RUN mkdir -p /data/db

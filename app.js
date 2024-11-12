@@ -1,7 +1,9 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const port = 8082;
+
 
 // Middleware to parse JSON data
 app.use(express.json());
@@ -26,4 +28,5 @@ app.use('/register', register);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
+
 });
