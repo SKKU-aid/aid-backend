@@ -6,6 +6,7 @@ const Scholarship = require('../models/Scholarship.js');
 const CompactScholarship = require('../models/CompactScholarship.js');
 const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
+const compactScholarship = require('../compactScholarship.js');
 
 
 //It return data right form
@@ -14,37 +15,29 @@ router.get('/', async (req, res) => {
     const userID = req.query.userID;
 
     try {
-        const user = await User.findOne({  userID: userID }, 'savedScholarship');
+        //find user by userID
+        const user = await User.findOne({ userID: userID }, 'savedScholarship');
+        console.log(`userID:${userID}`);
         if (!user) {
-            return res.status(404).json(createResponse(false, "User not found", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
         // Convert saved scholarship IDs to numbers if necessary
         const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
+        console.log(`savedScholarshipIDs : ${savedScholarshipIDs}`);
 
         // Get scholarships from the database
         const scholarships = await Scholarship.find();
+        if (!scholarship) {
+            return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
+        }
 
         // Convert scholarships to compact format with required fields
-        const compactScholarships = scholarships.map(scholarship => {
-            const scholarshipID = scholarship._id;
-            return {
-                scholarshipID,
-                scholarshipName: scholarship.scholarshipName || "Unknown Scholarship",
-                applicationPeriod: scholarship.applicationPeriod || "Unknown Period",
-                foundation: scholarship.foundation || "Unknown Foundation",
-                views: scholarship.views || 0,
-                isFav: savedScholarshipIDs.includes(scholarshipID),
-                tags: scholarship.tags || [
-                    scholarship.scholarshipType || "General",
-                    scholarship.regionalRestrictions?.[0] || "No Region",
-                    scholarship.eligibleMajors?.[0] || "No Major"
-                ]
-            };
-        });
+        const compactScholarships = scholarships.map(scholarship => compactScholarship(scholarship, savedScholarshipIDs));
 
-        // Directly return the compact scholarship data
-        res.status(200).json(createResponse(true,"Succesfuly return data",compactScholarships));
+        // Return data
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving scholarships:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarships", null));
@@ -59,8 +52,10 @@ router.get('/:scholarshipID', async (req, res) => {
 
     try {
         const user = await User.findOne({ userID: userID }, 'savedScholarship');
+        console.log(`userID:${userID}`);
         if (!user) {
-            return res.status(404).json(createResponse(false, "User not found", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
         // Convert saved scholarship IDs to numbers if necessary
@@ -68,28 +63,16 @@ router.get('/:scholarshipID', async (req, res) => {
 
         // Get the scholarship from the database
         const scholarship = await Scholarship.findOne({ _id: scholarshipID });
-
+        console.log(`scholarshipID: ${scholarship._id} doesn't exist`);
         if (!scholarship) {
-            return res.status(404).json(createResponse(false, "Scholarship not found", null));
+            return res.status(404).json(createResponse(false, `scholarshipID: ${scholarship._id} doesn't exist`, null));
         }
 
-        // Convert the scholarship to compact format with required fields
-        const compactScholarship = {
-            scholarshipID: scholarship._id,
-            scholarshipName: scholarship.scholarshipName || "Unknown Scholarship",
-            applicationPeriod: scholarship.applicationPeriod || "Unknown Period",
-            foundation: scholarship.foundation || "Unknown Foundation",
-            views: scholarship.views || 0,
-            isFav: savedScholarshipIDs.includes(scholarship._id),
-            tags: scholarship.tags || [
-                scholarship.scholarshipType || "General",
-                scholarship.regionalRestrictions?.[0] || "No Region",
-                scholarship.eligibleMajors?.[0] || "No Major"
-            ]
-        };
+        // Convert scholarships to compact format with required fields
+        const compactScholarship = compactScholarship(scholarship, savedScholarshipIDs);
 
-        // Directly return the compact scholarship data
-        res.status(200).json(createResponse(true,"Succes to get data",compactScholarship));
+        // Return data
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarship));
     } catch (error) {
         console.error('Error retrieving scholarship:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarship", null));

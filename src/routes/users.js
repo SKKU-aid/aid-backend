@@ -6,6 +6,7 @@ const Scholarship = require('../models/Scholarship.js');
 const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
 const { findByIdAndUpdate } = require('../models/CompactScholarship.js');
+const compactScholarship = require('../compactScholarship.js');
 
 // getUserInfo
 router.get('/:userID', async (req, res) => {
@@ -21,7 +22,7 @@ router.get('/:userID', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         res.status(200).json(createResponse(true, "user information has been successfully retrieved", user));
     } catch (error) {
         console.error('Error retrieving user:', error);
@@ -43,7 +44,7 @@ router.put('/:userID/update-info', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         await User.findOneAndUpdate({ userID: userID }, req.body);
 
         res.status(200).json(createResponse(true, "user information has been successfully updated", req.body));
@@ -72,14 +73,14 @@ router.put('/:userID/update-pw', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         if (user.userPassword != currentPassword) {
             console.error(`wrong password`);
             return res.status(404).json(createResponse(false, "Wrong password", null));
         }
 
 
-        await User.findOneAndUpdate({ userID: userID }, {userPassword: updatePassword});
+        await User.findOneAndUpdate({ userID: userID }, { userPassword: updatePassword });
 
         res.status(200).json(createResponse(true, "user password has been successfully updated", null));
     } catch (error) {
@@ -94,30 +95,31 @@ router.put('/:userID/update-pw', async (req, res) => {
 router.get('/:userID/scholarships', async (req, res) => {
     const userID = req.params.userID; // Extract userID from the route parameter
     const type = req.query.type;
-    if (type != "custom") {
-        return res.status(500).json(createResponse(false, "type is not custom", null));
-    }
-    console.log('User ID:', userID); // For debugging
 
+    if (type != "custom") {
+        return res.status(400).json(createResponse(false, "type is not custom", null));
+    }
+
+    console.log('User ID:', userID); // For debugging
     try {
         // Retrieve user with necessary fields
         const user = await User.findOne({ userID: userID });
-
-        // Check if user is null (not found in the database)
+        console.log(`userID:${userID}`);
         if (!user) {
-            console.error(`User with user_id: ${userID} doesn't exist`);
-            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        // Query for scholarships where eligible_majors includes the user's major,
-        // user's GPA is above the minimum required, and income level meets the requirement
+        //need to implement
+        //matching Scholarships based on user's information
         const matchingScholarships = await Scholarship.find({
-            eligibleMajors: { $in: [user.major] }, // Wrap user.major in an array
-            minimumGPARequirement: { $lte: user.totalGPA },
             incomeLevelRequirement: { $gte: user.incomeLevel }
         });
+
+        const compactScholarships = matchingScholarships.map(scholarship => compactScholarship(matchingScholarships, []));
+
         console.log('Matching Scholarships:', matchingScholarships); // Log matching scholarships for debugging
-        res.status(200).json(createResponse(true, "Matching scholarships retrieved successfully", matchingScholarships));
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving scholarships for user:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarships for user", null));
@@ -128,30 +130,29 @@ router.get('/:userID/scholarships', async (req, res) => {
 //getSavedScholarshipsInfo
 router.get('/:userID/fav-scholarships', async (req, res) => {
     const userID = req.params.userID;
+
     try {
         // Retrieve the user and their saved scholarships
-        const user = await User.findOne({ userID }, 'savedScholarship');
+        const user = await User.findOne({ userID: userID });
+        console.log(`userID:${userID}`);
         if (!user) {
-            return res.status(404).json(createResponse(false, "User not found", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
-
         // Check if the user has any saved scholarships
-        const savedScholarshipIDs = user.savedScholarship || [];
-
-        // If there are no saved scholarships, return an empty array
-        if (savedScholarshipIDs.length === 0) {
-            return res.status(200).json(createResponse(true, "관심 장학을 불러오는데 성공 했습니다", [{}]));
-        }
+        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
 
         // Fetch the saved scholarships from the database
         const scholarships = await Scholarship.find({ _id: { $in: savedScholarshipIDs } });
 
-        // Map the scholarships to the desired compact format
+        // Convert scholarships to compact format with required fields
+        const compactScholarships = scholarships.map(scholarship => compactScholarship(scholarship, savedScholarshipIDs));
+
         // Return the data
-        res.status(200).json(createResponse(true, "관심 장학을 불러오는데 성공 했습니다", scholarships));
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving favorite scholarships:', error);
-        res.status(500).json(createResponse(false, "관심장학을 불러오는데 실패 했습니다", null));
+        res.status(500).json(createResponse(false, "Failed to retrieve favorite scholarships", null));
     }
 });
 
@@ -175,9 +176,9 @@ router.post('/:userID/fav-scholarships', async (req, res) => {
             return res.status(404).json(createResponse(false, "Favorite scholarship already exists", null));
         }
         savedScholarshipIDs.push(scholarshipID);
-        
+
         console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
-        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+        await User.findOneAndUpdate({ userID: userID }, { savedScholarship: savedScholarshipIDs });
 
         res.status(200).json(createResponse(true, "Favorite scholarships has been successfully deleted", null));
     } catch (error) {
@@ -209,7 +210,7 @@ router.delete('/:userID/fav-scholarships', async (req, res) => {
         savedScholarshipIDs.splice(index, 1);
 
         console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
-        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+        await User.findOneAndUpdate({ userID: userID }, { savedScholarship: savedScholarshipIDs });
 
         res.status(200).json(createResponse(true, "Favorite scholarships has been successfully added", null));
     } catch (error) {
