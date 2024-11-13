@@ -1,70 +1,32 @@
-const express = require('express')
+
+const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
-const port = 8082
+const port = 8082;
+
 
 // Middleware to parse JSON data
 app.use(express.json());
 
-// registerUser
-app.post('/register', (req, res) => {
+// Connect to MongoDB
+const mongoURI = 'mongodb://root:1398@mongo:27017/auth?authSource=admin';
+mongoose.connect(mongoURI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-});
+// Import routes
+const userRoutes = require('./src/routes/users');
+const scholarshipRoutes = require('./src/routes/scholarships');
+const login=require('./src/routes/login');
+const register=require('./src/routes/register');
 
-// checkIDReplicated
-app.get('/register/checkID', (req, res) => {
-
-});
-
-// getUserInfo
-app.get('/users/:userID', (req, res) => {
-
-
-});
-
-// updateUserInfo
-app.put('/users/:userID/update-info', (req, res) => {
-
-});
-
-// updateUserPassWord
-app.put('/users/:userID/update-pw', (req, res) => {
-
-});
-
-// checkRegisterdUser, userLogin
-app.post('/login', (req, res) => {
-
-});
-
-// getScholarshipAll
-app.get('/scholarships', (req, res) => {
-});
-
-// getScholarship
-app.get('/scholarships/:scholarshipID', (req, res) => {
-
-});
-
-// getRecommandedScholarshipInfo
-app.get('/user/:userID/scholarships', (req, res) => {
-
-});
-
-// getSavedScholarshipsInfo
-app.get('/users/:userID/fav-scholarships', (req, res) => {
-
-});
-
-// addSavedScholarship
-app.post('/users/:userID/fav-scholarships', (req, res) => {
-
-});
-
-// deleteSavedScholarship
-app.delete('/users/:userID/fav-scholarships/:scholarshipID', (req, res) => {
-
-});
+// Use routes
+app.use('/users', userRoutes);
+app.use('/scholarships', scholarshipRoutes);
+app.use('/login', login);
+app.use('/register', register);
 
 app.listen(port, () => {
-    console.log('listening on 8082');
+    console.log(`Server running on port ${port}`);
+
 });
