@@ -6,6 +6,7 @@ const Scholarship = require('../models/Scholarship.js');
 const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
 const { findByIdAndUpdate } = require('../models/CompactScholarship.js');
+const compactScholarship = require('../compactScholarship.js');
 
 // getUserInfo
 router.get('/:userID', async (req, res) => {
@@ -21,7 +22,7 @@ router.get('/:userID', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         res.status(200).json(createResponse(true, "user information has been successfully retrieved", user));
     } catch (error) {
         console.error('Error retrieving user:', error);
@@ -43,7 +44,7 @@ router.put('/:userID/update-info', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         await User.findOneAndUpdate({ userID: userID }, req.body);
 
         res.status(200).json(createResponse(true, "user information has been successfully updated", req.body));
@@ -72,14 +73,14 @@ router.put('/:userID/update-pw', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         if (user.userPassword != currentPassword) {
             console.error(`wrong password`);
             return res.status(404).json(createResponse(false, "Wrong password", null));
         }
 
 
-        await User.findOneAndUpdate({ userID: userID }, {userPassword: updatePassword});
+        await User.findOneAndUpdate({ userID: userID }, { userPassword: updatePassword });
 
         res.status(200).json(createResponse(true, "user password has been successfully updated", null));
     } catch (error) {
@@ -94,30 +95,105 @@ router.put('/:userID/update-pw', async (req, res) => {
 router.get('/:userID/scholarships', async (req, res) => {
     const userID = req.params.userID; // Extract userID from the route parameter
     const type = req.query.type;
+
     if (type != "custom") {
-        return res.status(500).json(createResponse(false, "type is not custom", null));
+        return res.status(400).json(createResponse(false, "type is not custom", null));
     }
-    console.log('User ID:', userID); // For debugging
-
     try {
-        // Retrieve user with necessary fields
-        const user = await User.findOne({ userID: userID });
-
-        // Check if user is null (not found in the database)
+        //find user by userID
+        const user = await User.findOne({ userID: userID }, ['savedScholarship', 'birthday']);
+        console.log(`userID:${userID}`);
         if (!user) {
-            console.error(`User with user_id: ${userID} doesn't exist`);
-            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        // Query for scholarships where eligible_majors includes the user's major,
-        // user's GPA is above the minimum required, and income level meets the requirement
-        const matchingScholarships = await Scholarship.find({
-            eligibleMajors: { $in: [user.major] }, // Wrap user.major in an array
-            minimumGPARequirement: { $lte: user.totalGPA },
-            incomeLevelRequirement: { $gte: user.incomeLevel }
+        //calc user's age
+        const today = new Date();
+        // const userBirthDayString=user.birthday;
+        const userBirthDay = user.birthday;
+        // console.log(userBirthDay);
+        const userAge = today.getFullYear() - userBirthDay.getFullYear();
+        // console.log(userAge);
+
+        //matching Scholarships based on user's information
+        //after all condition is true return scholarship
+        let matchingScholarships = await Scholarship.find({
+            $and: [
+                //eligibleMajors
+                {
+                    $or: [
+                        { eligibleMajors: { $eq: null } },
+                        { eligibleMajors: { $in: user.major } },
+                    ]
+                },
+
+                // minimumGPARequirement
+                {
+                    $or: [
+                        { minimumGPARequirement: { $eq: null } },
+                        {
+                            $expr: {
+                                $cond: {
+                                    if: { $eq: ["$compTotalGPA", true] },
+                                    then: { $lte: ["$minimumGPARequirement", user.totalGPA] },
+                                    else: { $lte: ["$minimumGPARequirement", user.lastGPA] }
+                                }
+                            }
+                        }
+                    ]
+                },
+
+                //elligibleSemesters
+                {
+                    $or: [
+                        { eligibleSemesters: { $eq: null } },
+                        { eligibleSemesters: { $in: user.currentSemester } }
+                    ]
+                },
+
+                //ageLimit
+                {
+                    $or: [
+                        { ageLimit: { $eq: null } },
+                        { ageLimit: { $gte: userAge } }
+                    ]
+                },
+
+                // regionalRestrictions
+                {
+                    $or: [
+                        { regionalRestrictions: { $eq: null } },
+                        { regionalRestrictions: { $in: user.region } }
+                    ]
+                },
+
+                // incomeLevelRequirement
+                {
+                    $or: [
+                        { incomeLevelRequirement: { $eq: null } },
+                        { incomeLevelRequirement: { $gte: user.incomeLevel } }
+                    ]
+                },
+            ]
         });
-        console.log('Matching Scholarships:', matchingScholarships); // Log matching scholarships for debugging
-        res.status(200).json(createResponse(true, "Matching scholarships retrieved successfully", matchingScholarships));
+
+        console.log('Matching Scholarships:', matchingScholarships);
+
+        //check applicationPeriod 
+        matchingScholarships = matchingScholarships.filter(scholarship => {
+            if (!scholarship.applicationPeriod) return false; // Exclude if no applicationPeriod
+            const [start, end] = scholarship.applicationPeriod.split('~').map(date => new Date(date.trim()));
+            return today >= start && today <= end; // Check if today is within the range
+        });
+
+        // Convert scholarships to compact format with required fields
+        const compactScholarships = matchingScholarships.map(matchingScholarships => compactScholarship(matchingScholarships, []));
+
+        // Log matching scholarships for debugging
+        // console.log('Matching Scholarships:', matchingScholarships);
+
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving scholarships for user:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarships for user", null));
@@ -128,30 +204,32 @@ router.get('/:userID/scholarships', async (req, res) => {
 //getSavedScholarshipsInfo
 router.get('/:userID/fav-scholarships', async (req, res) => {
     const userID = req.params.userID;
+
     try {
-        // Retrieve the user and their saved scholarships
-        const user = await User.findOne({ userID }, 'savedScholarship');
+        //find user by userID
+        const user = await User.findOne({ userID: userID }, 'savedScholarship');
+        console.log(`userID:${userID}`);
         if (!user) {
-            return res.status(404).json(createResponse(false, "User not found", null));
+            console.error(`Can\'t find user who userID: ${userID}`);
+            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        // Check if the user has any saved scholarships
-        const savedScholarshipIDs = user.savedScholarship || [];
-
-        // If there are no saved scholarships, return an empty array
-        if (savedScholarshipIDs.length === 0) {
-            return res.status(200).json(createResponse(true, "관심 장학을 불러오는데 성공 했습니다", [{}]));
-        }
-
-        // Fetch the saved scholarships from the database
+        // Convert saved scholarship IDs to numbers if necessary
+        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
+        // Get saved scholarships from the database
         const scholarships = await Scholarship.find({ _id: { $in: savedScholarshipIDs } });
+        if (!scholarships) {
+            return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
+        }
 
-        // Map the scholarships to the desired compact format
+        // Convert scholarships to compact format with required fields
+        const compactScholarships = scholarships.map(scholarships => compactScholarship(scholarships, savedScholarshipIDs));
+
         // Return the data
-        res.status(200).json(createResponse(true, "관심 장학을 불러오는데 성공 했습니다", scholarships));
+        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving favorite scholarships:', error);
-        res.status(500).json(createResponse(false, "관심장학을 불러오는데 실패 했습니다", null));
+        res.status(500).json(createResponse(false, "Failed to retrieve favorite scholarships", null));
     }
 });
 
@@ -175,9 +253,9 @@ router.post('/:userID/fav-scholarships', async (req, res) => {
             return res.status(404).json(createResponse(false, "Favorite scholarship already exists", null));
         }
         savedScholarshipIDs.push(scholarshipID);
-        
+
         console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
-        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+        await User.findOneAndUpdate({ userID: userID }, { savedScholarship: savedScholarshipIDs });
 
         res.status(200).json(createResponse(true, "Favorite scholarships has been successfully deleted", null));
     } catch (error) {
@@ -209,7 +287,7 @@ router.delete('/:userID/fav-scholarships', async (req, res) => {
         savedScholarshipIDs.splice(index, 1);
 
         console.log('saved scholarship ID:', savedScholarshipIDs); // For debugging
-        await User.findOneAndUpdate({ userID: userID }, {savedScholarship: savedScholarshipIDs});
+        await User.findOneAndUpdate({ userID: userID }, { savedScholarship: savedScholarshipIDs });
 
         res.status(200).json(createResponse(true, "Favorite scholarships has been successfully added", null));
     } catch (error) {
