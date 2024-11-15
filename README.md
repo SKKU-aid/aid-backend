@@ -22,7 +22,9 @@ http://localhost:8081
 4. Run the following command to start scraping:
     ```bash
     cd skku_notice
-    scrapy crawl skku_notice -o notices.json
+    <!-- scrapy crawl skku_notice -o notices.json -->
+    chmod +x crawl_script.sh
+    ./crawl_script.sh
     ```
 5. The scraped results will be stored in notices.json.
 
@@ -30,10 +32,15 @@ http://localhost:8081
 1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.
 2. Start the Jupyter Notebook server and navigate to the following script:
     ```bash
-    jupyter notebook /skku_notice/parsing/langchain_script.ipynb
-    Open the langchain_script.ipynb notebook to initiate the parsing process.
+    docker run -it --name jupyter-container \
+        -p 8888:8888 \
+        -v "$(pwd)":/app \
+        aid-backend-image \
+        /bin/bash -c "source /usr/local/app/venv/bin/activate && jupyter notebook --ip=0.0.0.0 --no-browser --allow-root"
     ```
+    Open the `skku_notice\parsing\langchain_script.ipynb` notebook to initiate the parsing process.
 3. Run each cell in the notebook to process and structure the scraped data into a MongoDB-compatible JSON format.
+
 
 ## License
 
