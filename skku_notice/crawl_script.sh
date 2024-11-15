@@ -6,7 +6,7 @@ scrapy crawl skku_notice -o notices.json
 
 # Step 2: Run the second Scrapy crawl and append to notices.json
 echo "Running second Scrapy crawl..."
-scrapy crawl skku_notice -o notices.json
+scrapy crawl math_notice -o notices.json
 
 # Step 3: Merge the notices using the Python script
 echo "Merging notices using mergeNotice.py..."

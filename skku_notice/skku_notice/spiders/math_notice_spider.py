@@ -4,7 +4,8 @@ class SkkuNoticeSpider(scrapy.Spider):
     name = 'math_notice'
     allowed_domains = ['skku.edu']
     start_urls = [
-        'https://skb.skku.edu/math/community/under_notice.do?mode=list&srCategoryId1=158&srSearchKey=&srSearchVal='
+        # 'https://skb.skku.edu/math/community/under_notice.do?mode=list&srCategoryId1=158&srSearchKey=&srSearchVal='
+        'https://cse.skku.edu/cse/notice.do?mode=list&srCategoryId1=1586&srSearchKey=&srSearchVal='
     ]
     notice_count = 0  # Counter to track the number of notices processed
     max_notices = 10  # Limit the number of notices to crawl
@@ -12,9 +13,6 @@ class SkkuNoticeSpider(scrapy.Spider):
     def parse(self, response):
         # Extract notices, excluding the ones with "board-list-content-top"
         notices = response.css('dt.board-list-content-title:not(.board-list-content-top)')
-        
-        # Extract views for notices
-        views = response.css('span.board-mg-l10::text').getall()
 
         for i, notice in enumerate(notices):
             if self.notice_count < self.max_notices:
@@ -24,7 +22,7 @@ class SkkuNoticeSpider(scrapy.Spider):
                     full_link = response.urljoin(link)
                     self.notice_count += 1
                     # Pass the corresponding view count using meta
-                    yield response.follow(full_link, callback=self.parse_notice, meta={'views': views[i]})
+                    yield response.follow(full_link, callback=self.parse_notice)
             else:
                 break
 
@@ -47,12 +45,10 @@ class SkkuNoticeSpider(scrapy.Spider):
         else:
             content = 'Content not found'
         start_date = response.css('ul.board-etc-wrap li:nth-child(3)::text').get(default='Start date not found').strip()
-        views = response.meta.get('views', 'Views not found')
 
         yield {
             'title': title,
             'link': response.url,
             'start_date': start_date,
-            'views': views,
             'content': content
         }

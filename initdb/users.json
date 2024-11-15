@@ -2,7 +2,7 @@
     {
         "userID": "example1@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "2001-01-01",
         "currentSemester": 4,
         "currentStatus": "재학",
@@ -16,7 +16,7 @@
     {
         "userID": "example2@skku.edu",
         "userPassword": "1398",
-        "sex": false,
+        "gender": false,
         "birthday": "1999-02-15",
         "currentSemester": 9,
         "currentStatus": "휴학",
@@ -30,7 +30,7 @@
     {
         "userID": "example3@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "2000-05-21",
         "currentSemester": 6,
         "currentStatus": "수료",
@@ -44,7 +44,7 @@
     {
         "userID": "example4@skku.edu",
         "userPassword": "1398",
-        "sex": false,
+        "gender": false,
         "birthday": "2002-08-10",
         "currentSemester": 2,
         "currentStatus": "재학",
@@ -58,7 +58,7 @@
     {
         "userID": "example5@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "2001-04-03",
         "currentSemester": 5,
         "currentStatus": "재학",
@@ -72,7 +72,7 @@
     {
         "userID": "example6@skku.edu",
         "userPassword": "1398",
-        "sex": false,
+        "gender": false,
         "birthday": "2000-11-27",
         "currentSemester": 7,
         "currentStatus": "재학",
@@ -86,7 +86,7 @@
     {
         "userID": "example7@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "1998-03-22",
         "currentSemester": 9,
         "currentStatus": "휴학",
@@ -100,7 +100,7 @@
     {
         "userID": "example8@skku.edu",
         "userPassword": "1398",
-        "sex": false,
+        "gender": false,
         "birthday": "1999-07-30",
         "currentSemester": 8,
         "currentStatus": "재학",
@@ -114,7 +114,7 @@
     {
         "userID": "example9@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "2000-10-12",
         "currentSemester": 3,
         "currentStatus": "재학",
@@ -128,7 +128,7 @@
     {
         "userID": "example10@skku.edu",
         "userPassword": "1398",
-        "sex": true,
+        "gender": true,
         "birthday": "2002-01-18",
         "currentSemester": 1,
         "currentStatus": "재학",
