@@ -3,7 +3,10 @@ import scrapy
 class SkkuNoticeSpider(scrapy.Spider):
     name = 'skku_notice'
     allowed_domains = ['skku.edu']
-    start_urls = ['https://www.skku.edu/skku/campus/skk_comm/notice06.do']
+    start_urls = [
+        'https://www.skku.edu/skku/campus/skk_comm/notice06.do', 
+        # 'https://skb.skku.edu/math/community/under_notice.do?mode=list&srCategoryId1=158&srSearchKey=&srSearchVal='
+        ]
     notice_count = 0  # Counter to track the number of notices processed
     max_notices = 30  # Limit the number of notices to crawl
 

@@ -22,7 +22,9 @@ http://localhost:8081
 4. Run the following command to start scraping:
     ```bash
     cd skku_notice
-    scrapy crawl skku_notice -o notices.json
+    <!-- scrapy crawl skku_notice -o notices.json -->
+    chmod +x crawl_script.sh
+    ./crawl_script.sh
     ```
 5. The scraped results will be stored in notices.json.
 
