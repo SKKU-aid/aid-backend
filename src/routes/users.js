@@ -99,26 +99,100 @@ router.get('/:userID/scholarships', async (req, res) => {
     if (type != "custom") {
         return res.status(400).json(createResponse(false, "type is not custom", null));
     }
-
-    console.log('User ID:', userID); // For debugging
     try {
-        // Retrieve user with necessary fields
-        const user = await User.findOne({ userID: userID });
+        //find user by userID
+        const user = await User.findOne({ userID: userID }, ['savedScholarship', 'birthday']);
         console.log(`userID:${userID}`);
         if (!user) {
             console.error(`Can\'t find user who userID: ${userID}`);
             return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        //need to implement
+        //calc user's age
+        const today = new Date();
+        // const userBirthDayString=user.birthday;
+        const userBirthDay = user.birthday;
+        // console.log(userBirthDay);
+        const userAge = today.getFullYear() - userBirthDay.getFullYear();
+        // console.log(userAge);
+
         //matching Scholarships based on user's information
-        const matchingScholarships = await Scholarship.find({
-            incomeLevelRequirement: { $gte: user.incomeLevel }
+        //after all condition is true return scholarship
+        let matchingScholarships = await Scholarship.find({
+            $and: [
+                //eligibleMajors
+                {
+                    $or: [
+                        { eligibleMajors: { $eq: null } },
+                        { eligibleMajors: { $in: user.major } },
+                    ]
+                },
+
+                // minimumGPARequirement
+                {
+                    $or: [
+                        { minimumGPARequirement: { $eq: null } },
+                        {
+                            $expr: {
+                                $cond: {
+                                    if: { $eq: ["$compTotalGPA", true] },
+                                    then: { $lte: ["$minimumGPARequirement", user.totalGPA] },
+                                    else: { $lte: ["$minimumGPARequirement", user.lastGPA] }
+                                }
+                            }
+                        }
+                    ]
+                },
+
+                //elligibleSemesters
+                {
+                    $or: [
+                        { eligibleSemesters: { $eq: null } },
+                        { eligibleSemesters: { $in: user.currentSemester } }
+                    ]
+                },
+
+                //ageLimit
+                {
+                    $or: [
+                        { ageLimit: { $eq: null } },
+                        { ageLimit: { $gte: userAge } }
+                    ]
+                },
+
+                // regionalRestrictions
+                {
+                    $or: [
+                        { regionalRestrictions: { $eq: null } },
+                        { regionalRestrictions: { $in: user.region } }
+                    ]
+                },
+
+                // incomeLevelRequirement
+                {
+                    $or: [
+                        { incomeLevelRequirement: { $eq: null } },
+                        { incomeLevelRequirement: { $gte: user.incomeLevel } }
+                    ]
+                },
+            ]
         });
 
-        const compactScholarships = matchingScholarships.map(scholarship => compactScholarship(matchingScholarships, []));
+        console.log('Matching Scholarships:', matchingScholarships);
 
-        console.log('Matching Scholarships:', matchingScholarships); // Log matching scholarships for debugging
+        //check applicationPeriod 
+        matchingScholarships = matchingScholarships.filter(scholarship => {
+            if (!scholarship.applicationPeriod) return false; // Exclude if no applicationPeriod
+            const [start, end] = scholarship.applicationPeriod.split('~').map(date => new Date(date.trim()));
+            return today >= start && today <= end; // Check if today is within the range
+        });
+
+        // Convert scholarships to compact format with required fields
+        const compactScholarships = matchingScholarships.map(matchingScholarships => compactScholarship(matchingScholarships, []));
+
+        // Log matching scholarships for debugging
+        // console.log('Matching Scholarships:', matchingScholarships);
+
         res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
         console.error('Error retrieving scholarships for user:', error);
@@ -132,21 +206,24 @@ router.get('/:userID/fav-scholarships', async (req, res) => {
     const userID = req.params.userID;
 
     try {
-        // Retrieve the user and their saved scholarships
-        const user = await User.findOne({ userID: userID });
+        //find user by userID
+        const user = await User.findOne({ userID: userID }, 'savedScholarship');
         console.log(`userID:${userID}`);
         if (!user) {
             console.error(`Can\'t find user who userID: ${userID}`);
             return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
-        // Check if the user has any saved scholarships
-        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
 
-        // Fetch the saved scholarships from the database
+        // Convert saved scholarship IDs to numbers if necessary
+        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
+        // Get saved scholarships from the database
         const scholarships = await Scholarship.find({ _id: { $in: savedScholarshipIDs } });
+        if (!scholarships) {
+            return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
+        }
 
         // Convert scholarships to compact format with required fields
-        const compactScholarships = scholarships.map(scholarship => compactScholarship(scholarship, savedScholarshipIDs));
+        const compactScholarships = scholarships.map(scholarships => compactScholarship(scholarships, savedScholarshipIDs));
 
         // Return the data
         res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));

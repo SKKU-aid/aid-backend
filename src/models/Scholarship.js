@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const scholarshipSchema = new mongoose.Schema({
+const scholarshipsSchema = mongoose.Schema({
     _id: { type: Number, required: true, unique: true },
     scholarshipName: { type: String, required: true },
     eligibleMajors: { type: [String], default: [] },
@@ -19,7 +19,10 @@ const scholarshipSchema = new mongoose.Schema({
     significant: { type: String, required: true, default: null },
     link: { type: String, required: true },
     views: { type: Number, required: true },
-    foundation: { type: String, required: true }
+    foundation: { type: String, required: true },
+    updatedDate: { type: Date, required: true }
 });
 
-module.exports = mongoose.model('Scholarships', scholarshipSchema, 'scholarships');
+const Scholarships = mongoose.model("Scholarships", scholarshipsSchema);
+
+module.exports = Scholarships;
