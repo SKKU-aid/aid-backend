@@ -1,3 +1,6 @@
+import os
+import json
+import pymongo
 import scrapy
 
 class SkkuNoticeSpider(scrapy.Spider):
@@ -6,30 +9,59 @@ class SkkuNoticeSpider(scrapy.Spider):
     start_urls = [
         'https://www.skku.edu/skku/campus/skk_comm/notice06.do',
         ]
-    notice_count = 0  # Counter to track the number of notices processed
-    max_notices = 30  # Limit the number of notices to crawl
+    notice_counts = {}  # Counter to track the number of notices processed
+    max_notices = 10  # Limit the number of notices to crawl
 
+    def __init__(self, *args, **kwargs):
+        super(SkkuNoticeSpider, self).__init__(*args, **kwargs)
+        self.mongo_client = pymongo.MongoClient(os.getenv("MONGO_URI"))
+        self.db = self.mongo_client["db"]
+        self.collection = self.db["scholarships"]
+        
+    def closed(self, reason):
+        self.mongo_client.close()
+        
     def parse(self, response):
-        links = response.css('dt.board-list-content-title a::attr(href)').getall()
-        for i, link in enumerate(links):
-            if self.notice_count < self.max_notices:
-                full_link = response.urljoin(link)
-                self.notice_count += 1
-                yield response.follow(full_link, callback=self.parse_notice)
+        current_url = response.url
+        if current_url not in self.notice_counts:
+            self.notice_counts[current_url] = 0
+            
+        notices = response.css('ul.board-list-wrap > li')
+        for notice in notices:
+            if self.notice_counts[current_url] < self.max_notices:
+                link = notice.css('dt.board-list-content-title a::attr(href)').get()
+                title = notice.css('dt.board-list-content-title a::text').get(default='Title not found').strip()
+                print("titleeeeee: ", title)
+                start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
+                if link:
+                    full_link = response.urljoin(link)
+                    self.notice_counts[current_url] += 1
+                    
+                    try:
+                        existing_doc = self.collection.find_one({"link": full_link})
+                    except Exception as e:
+                        self.log(f"Error: {e}")
+                        existing_doc = None
+                    if existing_doc:
+                        db_start_date = existing_doc.get("applicationPeriod", "").split("~")[0].strip()
+                        if start_date == db_start_date:
+                            self.log(f"Skipping: {title} (Dates match)")
+                            continue
+                    
+                    yield response.follow(full_link, callback=self.parse_notice, meta={'title': title, 'start_date': start_date})
             else:
                 break
-
-        # Handle pagination only if the max notices limit hasn't been reached
-        if self.notice_count < self.max_notices:
+            
+        if self.notice_counts[current_url] < self.max_notices:
             next_page = response.css('a.pg_next::attr(href)').get()
             if next_page:
                 yield response.follow(next_page, callback=self.parse)
 
     def parse_notice(self, response):
-        title = response.css('em.ellipsis::text').get(default='Title not found').strip()
+        title = response.meta.get('title', 'Title not found')
+        start_date = response.meta.get('start_date', 'Start date not found')           
         content = response.css('pre.pre::text').get(default='Content not found').replace('\r\n', ' ').strip()
-        start_date = response.css('span.date::text').get(default='Start date not found').strip()
-
+            
         yield {
             'title': title,
             'link': response.url,

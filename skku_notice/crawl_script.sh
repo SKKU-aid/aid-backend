@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -f notices.json
+
 # Step 1: Run the first Scrapy crawl and save to notices.json
 echo "Running first Scrapy crawl..."
 scrapy crawl skku_notice -o notices.json
