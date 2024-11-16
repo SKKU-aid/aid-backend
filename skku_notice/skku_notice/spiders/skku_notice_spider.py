@@ -2,15 +2,16 @@ import os
 import json
 import pymongo
 import scrapy
+from urllib.parse import urlparse
 
 class SkkuNoticeSpider(scrapy.Spider):
     name = 'skku_notice'
     allowed_domains = ['skku.edu']
     start_urls = [
         'https://www.skku.edu/skku/campus/skk_comm/notice06.do',
-        ]
+    ]
     notice_counts = {}  # Counter to track the number of notices processed
-    max_notices = 10  # Limit the number of notices to crawl
+    max_notices = 30  # Limit the number of notices to crawl
 
     def __init__(self, *args, **kwargs):
         super(SkkuNoticeSpider, self).__init__(*args, **kwargs)
@@ -22,21 +23,20 @@ class SkkuNoticeSpider(scrapy.Spider):
         self.mongo_client.close()
         
     def parse(self, response):
-        current_url = response.url
-        if current_url not in self.notice_counts:
-            self.notice_counts[current_url] = 0
+        parsed_url = urlparse(response.url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+        if base_url not in self.notice_counts:
+            self.notice_counts[base_url] = 0
             
         notices = response.css('ul.board-list-wrap > li')
         for notice in notices:
-            if self.notice_counts[current_url] < self.max_notices:
+            if self.notice_counts[base_url] < self.max_notices:
                 link = notice.css('dt.board-list-content-title a::attr(href)').get()
                 title = notice.css('dt.board-list-content-title a::text').get(default='Title not found').strip()
-                print("titleeeeee: ", title)
                 start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
                 if link:
                     full_link = response.urljoin(link)
-                    self.notice_counts[current_url] += 1
-                    
+                    self.notice_counts[base_url] += 1
                     try:
                         existing_doc = self.collection.find_one({"link": full_link})
                     except Exception as e:
@@ -52,7 +52,7 @@ class SkkuNoticeSpider(scrapy.Spider):
             else:
                 break
             
-        if self.notice_counts[current_url] < self.max_notices:
+        if self.notice_counts[base_url] < self.max_notices:
             next_page = response.css('a.pg_next::attr(href)').get()
             if next_page:
                 yield response.follow(next_page, callback=self.parse)
