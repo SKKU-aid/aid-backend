@@ -35,28 +35,6 @@ router.get('/:userID', async (req, res) => {
     }
 });
 
-// getUserInfo
-router.get('/:userID', async (req, res) => {
-    const userID = req.params.userID; // Extract userID from the route parameter
-    console.log('User ID:', userID); // For debugging
-
-    try {
-        // Retrieve user with necessary fields
-        const user = await User.findOne({ userID: userID });
-
-        // Check if user is null (not found in the database)
-        if (!user) {
-            console.error(`User with user_id: ${userID} doesn't exist`);
-            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
-        }
-        
-        res.status(200).json(createResponse(true, "user information has been successfully retrieved", user));
-    } catch (error) {
-        console.error('Error retrieving user:', error);
-        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
-    }
-});
-
 // updateUserInfo
 router.put('/:userID/update-info', async (req, res) => {
     const userID = req.params.userID; // Extract userID from the route parameter
