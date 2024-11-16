@@ -7,6 +7,12 @@ const createResponse = require('../responseTemplate.js');
 const createListResponse = require('../responseListTemplate.js');
 const { findByIdAndUpdate } = require('../models/CompactScholarship.js');
 const compactScholarship = require('../compactScholarship.js');
+const sendEmailNotification = require('../daemon/sendEmail.js');
+const generateVerificationCode = require('../daemon/verificationCode.js')
+const EventEmitter = require('events');
+const { verify } = require('crypto');
+
+require('dotenv').config()
 
 // getUserInfo
 router.get('/:userID', async (req, res) => {
@@ -54,7 +60,76 @@ router.put('/:userID/update-info', async (req, res) => {
     }
 });
 
-// updateUserInfo
+// generateVerificationCode
+router.post('/:userID/verify', async (req, res) => {
+    const userID = req.params.userID; // Extract userID from the route parameter
+    console.log('User ID:', userID); // For debugging
+
+    try {
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+
+        const verifyCode = generateVerificationCode();
+        const email = user.userEmail;
+        const subject = "SKKU Scholarship Verification Code";
+        const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
+
+        await User.findOneAndUpdate({ userID: userID }, {$set: {verifyCode : verifyCode, verifyCodeCreatedAt: new Date()}});
+
+        sendEmailNotification({email, subject, text});
+
+        res.status(200).json(createResponse(true, "verification code has been successfully generated", req.body));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+// checkVerificationCode
+router.post('/:userID/check-verify', async (req, res) => {
+    // const userID = req.params.userID; // Extract userID from the route parameter
+    // console.log('User ID:', userID); // For debugging
+
+    try {
+        const {
+            userID,
+            verifyCode
+        } = req.body;
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+        
+        if (!user.verifyCode || !user.verifyCodeCreatedAt || user.verifyCode != verifyCode) {
+            return res.status(404).json(createResponse(false, "verificataion code is wrong", null));
+        }
+
+        const currentTime = new Date();
+        const elapsedTime = currentTime - user.verifyCodeCreatedAt;
+        console.log('verify time:', elapsedTime);
+
+        if (elapsedTime > 5 * 60 * 1000) {
+            return res.status(404).json(createResponse(false, "verificataion code is expired", null));
+        }
+
+        res.status(200).json(createResponse(true, "verification code is correct", req.body));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+// updateUserPassWord
 router.put('/:userID/update-pw', async (req, res) => {
     try {
         // Extract user info from the route parameter

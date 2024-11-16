@@ -16,7 +16,9 @@ const UserSchema = mongoose.Schema(
         region: { type: String, required: true },
         savedScholarship: {
             type: [{ type: Number }], required: true, default: []
-        }
+        },
+        verifyCode: { type: String, required: false },
+        verifyCodeCreatedAt: { type: Date, required: false }
     }
 );
 
