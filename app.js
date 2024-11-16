@@ -2,9 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const port = 8082;
+const cors=require('cors')
 
 // Middleware to parse JSON data
 app.use(express.json());
+app.use(cors());
 
 // Connect to MongoDB
 const mongoURI = 'mongodb://root:1398@mongo:27017/auth?authSource=admin';
