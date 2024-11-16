@@ -4,9 +4,9 @@ const router = express.Router();
 const User = require("../models/User.js")
 const Scholarships = require('../models/Scholarship.js');
 const CompactScholarship = require('../models/CompactScholarship.js');
-const createResponse = require('../responseTemplate.js');
-const createListResponse = require('../responseListTemplate.js');
-const compactScholarship = require('../compactScholarship.js');
+const createResponse = require('../utils/responseTemplate.js');
+const createListResponse = require('../utils/responseListTemplate.js');
+const compactScholarship = require('../utils/compactScholarship.js');
 
 
 //It return data right form

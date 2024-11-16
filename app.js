@@ -3,13 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const port = 8082;
-
+const cors = require('cors')
 
 // Middleware to parse JSON data
 app.use(express.json());
+//To resolve access problem
+app.use(cors());
 
 // Connect to MongoDB
-const mongoURI =process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI;
 mongoose.connect(mongoURI)
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.error("MongoDB connection error:", err));
