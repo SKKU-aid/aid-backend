@@ -1,24 +1,28 @@
 const mongoose = require('mongoose');
 
-const scholarshipSchema = new mongoose.Schema({
+const scholarshipsSchema = mongoose.Schema({
     _id: { type: Number, required: true, unique: true },
     scholarshipName: { type: String, required: true },
-    eligibleMajors: { type: [String], required: true, default: [] },
-    minimumGPARequirement: { type: Number, required: true, default: null },
-    eligibleSemesters: { type: [Number], required: true },
+    eligibleMajors: { type: [String], default: [] },
+    minimumGPARequirement: { type: Number, default: null },
+    compTotalGPA: { type: Boolean, default: null },
+    eligibleSemesters: { type: [Number], default: [] },
     scholarshipType: { type: String, required: true },
-    ageLimit: { type: Number, required: true, default: null },
-    regionalRestrictions: { type: [String], required: true },
-    incomeLevelRequirement: { type: Number, required: true, default: null },
+    ageLimit: { type: Number, default: null },
+    regionalRestrictions: { type: [String], default: [] },
+    incomeLevelRequirement: { type: Number, default: null },
     applicationPeriod: { type: String, required: true },
-    scholarshipAmount: { type: String, required: true, default: null },
+    scholarshipAmount: { type: String, default: null },
     numberOfRecipients: { type: Number, required: true },
-    requiredDocuments: { type: [String], required: true },
-    applicationMethod: { type: String, required: true },
+    requiredDocuments: { type: [String], default: [] },
+    applicationMethod: { type: String, default: null },
     significant: { type: String, required: true, default: null },
     link: { type: String, required: true },
-    views: { type: Number, required: true, default: 0 },
-    foundation: { type: String, required: true }
+    views: { type: Number, required: true },
+    foundation: { type: String, required: true },
+    uploadedDate: { type: Date, required: true }
 });
 
-module.exports = mongoose.model('Scholarships', scholarshipSchema, 'scholarships');
+const Scholarships = mongoose.model("Scholarships", scholarshipsSchema);
+
+module.exports = Scholarships;

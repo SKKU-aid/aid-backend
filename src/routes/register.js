@@ -2,12 +2,21 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User.js')
-const createResponse = require('../responseTemplate.js');
-const createListResponse = require('../responseListTemplate.js');
+const createResponse = require('../utils/responseTemplate.js');
+const createListResponse = require('../utils/responseListTemplate.js');
 
 // registerUser
 router.post('/', async (req, res) => {
     try {
+        const {
+            userID
+        } = req.body;
+        const user_exist = await User.findOne({ userID: userID });
+
+        if (user_exist !== null) {
+            return res.status(404).json(createResponse(false, "This userID already exists", null));
+        }
+
         const user = await User.create(req.body);
         if (!user) {
             return res.status(404).json(createResponse(false, "User not found", null));
