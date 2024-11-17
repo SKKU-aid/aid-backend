@@ -1,25 +1,32 @@
 import json
+import re
 
 # Read the JSON file
-with open("notices.json", "r", encoding="utf-8") as file:
+file_path = "notices.json"
+
+with open(file_path, "r", encoding="utf-8") as file:
     raw_data = file.read()
 
-# Replace "][" with "," to merge separate JSON arrays into one
-corrected_data = raw_data.replace("][", ",")
+# Replace "][" with ","
+processed_data = raw_data.replace("][", ",")
 
-# Load the merged JSON data into a Python list
-data = json.loads(corrected_data)
+# Remove whitespace around commas and prevent consecutive commas
+processed_data = re.sub(r'\s*,\s*', ',', processed_data)
+processed_data = re.sub(r',+', ',', processed_data)
 
-# Use a dictionary to remove duplicates based on the 'title' field
-unique_data = {}
-for item in data:
-    title = item['title']
-    if title not in unique_data:
-        unique_data[title] = item  # Add the item only if the title is not already in the dictionary
+# Wrap the content in a JSON array if not already wrapped
+if not processed_data.strip().startswith("["):
+    processed_data = f"[{processed_data}]"
 
-# Convert the dictionary values back to a list
-merged_data = list(unique_data.values())
+# Parse the JSON data
+try:
+    data = json.loads(processed_data)
+    print("JSON data loaded successfully.")
+except json.JSONDecodeError as e:
+    print(f"JSON parsing error: {e}")
+    data = []
 
-# Save the deduplicated data back to the JSON file
-with open("notices.json", "w", encoding="utf-8") as file:
-    json.dump(merged_data, file, ensure_ascii=False, indent=4)
+# Save the merged data
+with open(file_path, "w", encoding="utf-8") as file:
+    json.dump(data, file, ensure_ascii=False, indent=4)
+print(f"The merged data has been saved to {file_path}.")
