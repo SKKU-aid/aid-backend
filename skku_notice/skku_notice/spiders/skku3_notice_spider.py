@@ -2,17 +2,18 @@ import os
 import json
 import pymongo
 import scrapy
+from datetime import datetime
 from urllib.parse import urlparse
 
 class SkkuNoticeSpider(scrapy.Spider):
-    name = 'math_notice'
+    name = 'skku3_notice'
     allowed_domains = ['skku.edu']
     start_urls = [
-        'https://skb.skku.edu/math/community/under_notice.do?mode=list&srCategoryId1=158&srSearchKey=&srSearchVal=',
-        'https://cse.skku.edu/cse/notice.do?mode=list&srCategoryId1=1586&srSearchKey=&srSearchVal=',
+        # 약학대학
+        "https://pharm.skku.edu/bbs/board.php?bo_table=notice&sca=&sop=and&sfl=wr_subject&stx=%EC%9E%A5%ED%95%99"
     ]
     notice_counts = {}  # Counter to track the number of notices processed
-    max_notices = 5  # Limit the number of notices to crawl
+    max_notices = 10  # Limit the number of notices to crawl
 
     def __init__(self, *args, **kwargs):
         super(SkkuNoticeSpider, self).__init__(*args, **kwargs)
@@ -29,17 +30,22 @@ class SkkuNoticeSpider(scrapy.Spider):
         if base_url not in self.notice_counts:
             self.notice_counts[base_url] = 0
             
-        notices = response.css('ul.board-list-wrap > li')
+        notices = response.css('ol.bo_lst > li')
 
         for notice in notices:
-            if self.notice_counts[base_url] < self.max_notices:
-                if notice.css('dt.board-list-content-top'):
-                    print("Skipping top noticeeeeeeeeee")
-                    continue
+            if self.notice_counts[base_url] < self.max_notices:                
+                link = notice.css('a::attr(href)').get()
+                start_date = notice.css('span.time::text').get(default='Start date not found').strip()
                 
-                link = notice.css('dt.board-list-content-title a::attr(href)').get()
-                title = notice.css('dt.board-list-content-title a::text').get(default='Title not found').strip()
-                start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
+                try:
+                    _date = datetime.strptime(start_date, '%Y-%m-%d')
+                except ValueError:
+                    self.log(f"Invalid date format: {start_date}")
+                    continue
+                if (datetime.now() - _date).days > 60:
+                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 90 days.")
+                    return
+                
                 if link:
                     full_link = response.urljoin(link)
                     self.notice_counts[base_url] += 1
@@ -51,31 +57,31 @@ class SkkuNoticeSpider(scrapy.Spider):
                     if existing_doc:
                         db_start_date = existing_doc.get("applicationPeriod", "").split("~")[0].strip()
                         if start_date == db_start_date:
-                            self.log(f"Skipping: {title} (Dates match)")
                             continue
                     
-                    yield response.follow(full_link, callback=self.parse_notice, meta={'title': title, 'start_date': start_date})
+                    yield response.follow(full_link, callback=self.parse_notice, meta={'start_date': start_date})
             else:
                 break
 
-        # Handle pagination only if the max notices limit hasn't been reached
-        if self.notice_counts[base_url] < self.max_notices:
-            next_page = response.css('a.page-next::attr(href)').get()
-            if next_page:
-                yield response.follow(next_page, callback=self.parse)
-
     def parse_notice(self, response):
-        title = response.meta.get('title', 'Title not found')
+        title = response.css('section#bo_view header h1::text').get(default='Title not found').strip()
+        if "한국장학재단" in title:
+            return
+        department = "약학과"
         start_date = response.meta.get('start_date', 'Start date not found')  
-        content = response.css('div.fr-view *::text').getall()
+        
+        content = response.css('div#bo_v_con *::text').getall()
         if content:
             content = ' '.join([text.strip() for text in content if text.strip()]).replace('\xa0', ' ').replace('\r\n', ' ')
+            if not content:
+                content = 'Content not found'
         else:
             content = 'Content not found'
 
         yield {
             'title': title,
             'link': response.url,
+            'department': department,
             'start_date': start_date,
             'content': content
         }

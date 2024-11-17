@@ -2,6 +2,7 @@ import os
 import json
 import pymongo
 import scrapy
+from datetime import datetime
 from urllib.parse import urlparse
 
 class SkkuNoticeSpider(scrapy.Spider):
@@ -34,7 +35,17 @@ class SkkuNoticeSpider(scrapy.Spider):
                 link = notice.css('dt.board-list-content-title a::attr(href)').get()
                 title = notice.css('dt.board-list-content-title a::text').get(default='Title not found').strip()
                 start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
-                if link:
+                
+                try:
+                    _date = datetime.strptime(start_date, '%Y-%m-%d')
+                except ValueError:
+                    self.log(f"Invalid date format: {start_date}")
+                    continue
+                if (datetime.now() - _date).days > 90:
+                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 90 days.")
+                    return
+                    
+                if link:                    
                     full_link = response.urljoin(link)
                     self.notice_counts[base_url] += 1
                     try:
