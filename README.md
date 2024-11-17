@@ -29,7 +29,7 @@ http://localhost:8081
 
 ### How to Use LangChain for Parsing
 1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.
-2. Start the Jupyter Notebook server and navigate to the following script:
+2. Start the Jupyter Notebook server and navigate to the following script (in Linux):
     ```bash
     docker run -it --name jupyter-container \
         -p 8888:8888 \
