@@ -22,18 +22,32 @@ try:
     max_id = max_id_document["_id"] if max_id_document else 0
 
     print(f"Current max _id in database: {max_id}")
-    
-    for idx, scholarship in enumerate(scholarship_data, start=1):
-        scholarship["_id"] = idx
             
     for scholarship in scholarship_data:
-        max_id += 1
-        scholarship["_id"] = max_id
-
-        try:
-            collection.insert_one(scholarship)
-            print(f"Inserted: {scholarship['_id']}")
-        except Exception as e:
-            print(f"Error inserting {scholarship['_id']}: {e}")
+        # Find if there's an existing document with the same link
+        existing_doc = collection.find_one({"link": scholarship["link"]})
+        
+        if existing_doc:
+            if existing_doc["applicationPeriod"] == scholarship["applicationPeriod"]:
+                # Same applicationPeriod, do not add
+                print(f"Duplicate found with same applicationPeriod for link: {scholarship['link']}, skipping...")
+                continue  # Skip to next scholarship
+            else:
+                # Different applicationPeriod, overwrite the data at that _id
+                scholarship["_id"] = existing_doc["_id"]
+                try:
+                    collection.replace_one({"_id": existing_doc["_id"]}, scholarship)
+                    print(f"Updated scholarship with _id {existing_doc['_id']}")
+                except Exception as e:
+                    print(f"Error updating scholarship with _id {existing_doc['_id']}: {e}")
+        else:
+            # No existing document with the same link, insert as new document
+            max_id += 1
+            scholarship["_id"] = max_id
+            try:
+                collection.insert_one(scholarship)
+                print(f"Inserted new scholarship with _id {scholarship['_id']}")
+            except Exception as e:
+                print(f"Error inserting new scholarship with _id {scholarship['_id']}: {e}")
 finally:
     client.close()
