@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User.js')
-const createResponse = require('../responseTemplate.js');
+const createResponse = require('../utils/responseTemplate.js');
 
 // checkRegisteredUser, userLogin
 router.post('/', async (req, res) => {

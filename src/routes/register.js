@@ -2,8 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User.js')
-const createResponse = require('../responseTemplate.js');
-const createListResponse = require('../responseListTemplate.js');
+const createResponse = require('../utils/responseTemplate.js');
+const createListResponse = require('../utils/responseListTemplate.js');
 
 // registerUser
 router.post('/', async (req, res) => {

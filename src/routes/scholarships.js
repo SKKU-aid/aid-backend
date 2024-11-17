@@ -4,9 +4,9 @@ const router = express.Router();
 const User = require("../models/User.js")
 const Scholarships = require('../models/Scholarship.js');
 const CompactScholarship = require('../models/CompactScholarship.js');
-const createResponse = require('../responseTemplate.js');
-const createListResponse = require('../responseListTemplate.js');
-const compactScholarship = require('../compactScholarship.js');
+const createResponse = require('../utils/responseTemplate.js');
+const createListResponse = require('../utils/responseListTemplate.js');
+const compactScholarship = require('../utils/compactScholarship.js');
 
 
 //It return data right form
@@ -74,10 +74,10 @@ router.get('/:scholarshipID', async (req, res) => {
         }
 
         // Convert scholarships to compact format with required fields
-        const compactScholarshipData = compactScholarship(scholarship, savedScholarshipIDs);
+
 
         // Return data
-        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarshipData));
+        res.status(200).json(createResponse(true, "Succesfuly return data", scholarship));
     } catch (error) {
         console.error('Error retrieving scholarship:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarship", null));

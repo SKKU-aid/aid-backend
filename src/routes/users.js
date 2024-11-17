@@ -3,15 +3,15 @@ const express = require('express');
 const router = express.Router();
 const User = require("../models/User.js")
 const Scholarship = require('../models/Scholarship.js');
-const createResponse = require('../responseTemplate.js');
-const createListResponse = require('../responseListTemplate.js');
+const createResponse = require('../utils/responseTemplate.js');
+const createListResponse = require('../utils/responseListTemplate.js');
 const { findByIdAndUpdate } = require('../models/CompactScholarship.js');
-const compactScholarship = require('../compactScholarship.js');
+const compactScholarship = require('../utils/compactScholarship.js');
 const sendEmailNotification = require('../daemon/sendEmail.js');
 const generateVerificationCode = require('../daemon/verificationCode.js')
 const EventEmitter = require('events');
 const { verify } = require('crypto');
-
+const buildMatchingScholarships = require('../utils/buildMatchingScholarships.js');
 require('dotenv').config()
 
 // getUserInfo
@@ -80,9 +80,9 @@ router.post('/:userID/verify', async (req, res) => {
         const subject = "SKKU Scholarship Verification Code";
         const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
 
-        await User.findOneAndUpdate({ userID: userID }, {$set: {verifyCode : verifyCode, verifyCodeCreatedAt: new Date()}});
+        await User.findOneAndUpdate({ userID: userID }, { $set: { verifyCode: verifyCode, verifyCodeCreatedAt: new Date() } });
 
-        sendEmailNotification({email, subject, text});
+        sendEmailNotification({ email, subject, text });
 
         res.status(200).json(createResponse(true, "verification code has been successfully generated", req.body));
     } catch (error) {
@@ -109,7 +109,7 @@ router.post('/:userID/check-verify', async (req, res) => {
             console.error(`User with user_id: ${userID} doesn't exist`);
             return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
         }
-        
+
         if (!user.verifyCode || !user.verifyCodeCreatedAt || user.verifyCode != verifyCode) {
             return res.status(404).json(createResponse(false, "verificataion code is wrong", null));
         }
@@ -183,90 +183,20 @@ router.get('/:userID/scholarships', async (req, res) => {
             return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        //calc user's age
-        const today = new Date();
-        // const userBirthDayString=user.birthday;
-        const userBirthDay = user.birthday;
-        // console.log(userBirthDay);
-        const userAge = today.getFullYear() - userBirthDay.getFullYear();
-        // console.log(userAge);
+        // Convert saved scholarship IDs to numbers if necessary
+        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
 
-        //matching Scholarships based on user's information
-        //after all condition is true return scholarship
-        let matchingScholarships = await Scholarship.find({
-            $and: [
-                //eligibleMajors
-                {
-                    $or: [
-                        { eligibleMajors: { $eq: null } },
-                        { eligibleMajors: { $in: user.major } },
-                    ]
-                },
-
-                // minimumGPARequirement
-                {
-                    $or: [
-                        { minimumGPARequirement: { $eq: null } },
-                        {
-                            $expr: {
-                                $cond: {
-                                    if: { $eq: ["$compTotalGPA", true] },
-                                    then: { $lte: ["$minimumGPARequirement", user.totalGPA] },
-                                    else: { $lte: ["$minimumGPARequirement", user.lastGPA] }
-                                }
-                            }
-                        }
-                    ]
-                },
-
-                //elligibleSemesters
-                {
-                    $or: [
-                        { eligibleSemesters: { $eq: null } },
-                        { eligibleSemesters: { $in: user.currentSemester } }
-                    ]
-                },
-
-                //ageLimit
-                {
-                    $or: [
-                        { ageLimit: { $eq: null } },
-                        { ageLimit: { $gte: userAge } }
-                    ]
-                },
-
-                // regionalRestrictions
-                {
-                    $or: [
-                        { regionalRestrictions: { $eq: null } },
-                        { regionalRestrictions: { $in: user.region } }
-                    ]
-                },
-
-                // incomeLevelRequirement
-                {
-                    $or: [
-                        { incomeLevelRequirement: { $eq: null } },
-                        { incomeLevelRequirement: { $gte: user.incomeLevel } }
-                    ]
-                },
-            ]
-        });
-
-        console.log('Matching Scholarships:', matchingScholarships);
+        const scholarships = await Scholarship.find();
+        // console.log('Scholarships:', scholarships);
 
         //check applicationPeriod 
-        matchingScholarships = matchingScholarships.filter(scholarship => {
-            if (!scholarship.applicationPeriod) return false; // Exclude if no applicationPeriod
-            const [start, end] = scholarship.applicationPeriod.split('~').map(date => new Date(date.trim()));
-            return today >= start && today <= end; // Check if today is within the range
-        });
+        const matchingScholarships = scholarships.filter(buildMatchingScholarships(user));
+        console.log('Matching Scholarships:', matchingScholarships);
 
         // Convert scholarships to compact format with required fields
-        const compactScholarships = matchingScholarships.map(matchingScholarships => compactScholarship(matchingScholarships, []));
-
+        const compactScholarships = matchingScholarships.map(matchingScholarship => compactScholarship(matchingScholarship, savedScholarshipIDs));
+        // console.log('comparctScholarships', compactScholarships);
         // Log matching scholarships for debugging
-        // console.log('Matching Scholarships:', matchingScholarships);
 
         res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {
