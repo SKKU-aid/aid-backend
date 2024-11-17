@@ -11,7 +11,7 @@ const sendEmailNotification = require('../daemon/sendEmail.js');
 const generateVerificationCode = require('../daemon/verificationCode.js')
 const EventEmitter = require('events');
 const { verify } = require('crypto');
-const buildMatchingScholarshipsQuery = require('../utils/buildMatchingScholarshipQuery.js');
+const buildMatchingScholarships = require('../utils/buildMatchingScholarships.js');
 require('dotenv').config()
 
 // getUserInfo
@@ -183,33 +183,20 @@ router.get('/:userID/scholarships', async (req, res) => {
             return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
         }
 
-        //calc user's age
-        const today = new Date();
-        // const userBirthDayString=user.birthday;
-        const userBirthDay = user.birthday;
-        // console.log(userBirthDay);
-        const userAge = today.getFullYear() - userBirthDay.getFullYear();
-        // console.log(userAge);
+        // Convert saved scholarship IDs to numbers if necessary
+        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
 
-        //matching Scholarships based on user's information
-        //after all condition is true return scholarship
-        const query = buildMatchingScholarshipQuery(user, userAge);
-        let matchingScholarships = await Scholarship.find(query);
-
-        console.log('Matching Scholarships:', matchingScholarships);
+        const scholarships = await Scholarship.find();
+        // console.log('Scholarships:', scholarships);
 
         //check applicationPeriod 
-        matchingScholarships = matchingScholarships.filter(scholarship => {
-            if (!scholarship.applicationPeriod) return false; // Exclude if no applicationPeriod
-            const [start, end] = scholarship.applicationPeriod.split('~').map(date => new Date(date.trim()));
-            return today >= start && today <= end; // Check if today is within the range
-        });
+        const matchingScholarships = scholarships.filter(buildMatchingScholarships(user));
+        console.log('Matching Scholarships:', matchingScholarships);
 
         // Convert scholarships to compact format with required fields
-        const compactScholarships = matchingScholarships.map(matchingScholarships => compactScholarship(matchingScholarships, []));
-
+        const compactScholarships = matchingScholarships.map(matchingScholarship => compactScholarship(matchingScholarship, savedScholarshipIDs));
+        // console.log('comparctScholarships', compactScholarships);
         // Log matching scholarships for debugging
-        // console.log('Matching Scholarships:', matchingScholarships);
 
         res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarships));
     } catch (error) {

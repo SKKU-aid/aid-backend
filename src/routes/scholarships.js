@@ -74,10 +74,10 @@ router.get('/:scholarshipID', async (req, res) => {
         }
 
         // Convert scholarships to compact format with required fields
-        const compactScholarshipData = compactScholarship(scholarship, savedScholarshipIDs);
+
 
         // Return data
-        res.status(200).json(createResponse(true, "Succesfuly return data", compactScholarshipData));
+        res.status(200).json(createResponse(true, "Succesfuly return data", scholarship));
     } catch (error) {
         console.error('Error retrieving scholarship:', error);
         res.status(500).json(createResponse(false, "Failed to retrieve scholarship", null));
