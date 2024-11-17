@@ -6,7 +6,9 @@ from pymongo.server_api import ServerApi
 uri = os.getenv("MONGO_URI")
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-with open("./response.json", "r", encoding="utf-8") as file:
+current_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(current_dir, "response.json")
+with open(file_path, "r", encoding="utf-8") as file:
     scholarship_data = json.load(file)
 
 try:

@@ -29,29 +29,17 @@ http://localhost:8081
 
 ### How to Use LangChain for Parsing
 
-1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.
-2. Start the Jupyter Notebook server and navigate to the following script (in Linux):
+1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.  
+2. Use the following script to parse the crawled data using LangChain:  
     ```bash
-    docker run -it --name jupyter-container \
-        -p 8888:8888 \
-        -v "$(pwd)":/app \
-        aid-backend-image \
-        /bin/bash -c "source /usr/local/app/venv/bin/activate && jupyter notebook --ip=0.0.0.0 --no-browser --allow-root"
-    ```
+    python3 parsing/parsing_notices.py
+    ```  
+3. Save the parsed data (`response.json`) to the database:  
+    ```bash
+    python3 parsing/insert_db.py
+    ```  
 
-    **Note:** If you see an error indicating that the container name `jupyter-container` is already in use, it means the container is currently running or already exists. In this case, follow these steps:
-
-    - Stop the existing container:
-        ```bash
-        docker stop jupyter-container
-        ```
-    - Remove the container:
-        ```bash
-        docker rm jupyter-container
-        ```
-    - Run the command again to start a new container.
-3. Open the `skku_notice\parsing\langchain_script.ipynb` notebook to initiate the parsing process.
-4. Run each cell in the notebook to process and structure the scraped data into a MongoDB-compatible JSON format.
+**Note:** Make sure to verify the contents of `response.json` before running the database insertion script to ensure accuracy.
 
 
 ## License
