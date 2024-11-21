@@ -32,6 +32,7 @@ app.use('/register', register);
 //run services
 require('./src/services/sendSavedScholarshipsBeforeDeadline');
 require('./src/services/sendMatchingScholarships');
+require('./src/services/sendUpdatedSavedScholarships');
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

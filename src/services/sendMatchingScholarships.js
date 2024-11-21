@@ -7,6 +7,7 @@ const createResponse = require('../utils/responseTemplate.js');
 const createListResponse = require('../utils/responseListTemplate.js');
 const compactScholarship = require('../utils/compactScholarship.js');
 const buildMatchingScholarships = require('../utils/buildMatchingScholarships.js');
+const sendEmailNotification=require('../daemon/sendEmail.js');
 
 
 async function sendMatchingScholarships() {
@@ -17,7 +18,8 @@ async function sendMatchingScholarships() {
 
     try {
         // get users and scholarships info
-        const users = await User.find({ userID: "ohsj3781@gmail.com" });
+        const users = await User.find();
+        
         const scholarships = await Scholarships.find();
 
         const recentlyUploadedScholarships = scholarships.filter(scholarship => {
@@ -29,19 +31,15 @@ async function sendMatchingScholarships() {
         });
 
         for (const user of users) {
-            console.log('User Email:', user.userEmail);
+            console.log('User Email:', user.userID);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const matchingScholarships = recentlyUploadedScholarships.filter(buildMatchingScholarships(user));
 
-
-
             console.log('matchingScholarships:', matchingScholarships);
             //Todo
             //Send Email to user, Use matchingScholarships for implementation
-            sendEmailNotification({ email: user.userEmail, type: 'matchingScholarships', content: matchingScholarships });
-
-
+            sendEmailNotification({ email: user.userID, type: 'sendMatchingScholarships', content: matchingScholarships });
         }
 
     } catch (error) {
@@ -50,10 +48,10 @@ async function sendMatchingScholarships() {
     }
 }
 
-//execute function every day
-cron.schedule('0 0 */1 * *',sendMatchingScholarships);
+//execute function every 3 days at 22:00
+cron.schedule('0 22 */3 * *',sendMatchingScholarships);
 
 //execute this function every one minute (for testing)
-// cron.schedule('* * * * *', sendMatchingScholarships));
+// cron.schedule('* * * * *', sendMatchingScholarships);
 
 module.exports = sendMatchingScholarships;
