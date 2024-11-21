@@ -18,13 +18,15 @@ router.get('/', async (req, res) => {
         //find user by userID
         const user = await User.findOne({ userID: userID }, 'savedScholarship');
         console.log(`userID:${userID}`);
+        let savedScholarshipIDs = [];
         if (!user) {
             console.error(`Can\'t find user who userID: ${userID}`);
-            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
+        } else {
+            savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
         }
 
         // Convert saved scholarship IDs to numbers if necessary
-        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
+
         console.log(`savedScholarshipIDs : ${savedScholarshipIDs}`);
 
         // Get scholarships from the database
@@ -54,13 +56,12 @@ router.get('/:scholarshipID', async (req, res) => {
         //find user by userID
         const user = await User.findOne({ userID: userID }, 'savedScholarship');
         console.log(`userID:${userID}`);
+        let savedScholarshipIDs = [];
         if (!user) {
             console.error(`Can\'t find user who userID: ${userID}`);
-            return res.status(404).json(createResponse(false, `userID: ${userID} doesn't exist`, null));
+        } else {
+            savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
         }
-
-        // Convert saved scholarship IDs to numbers if necessary
-        const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
 
         // Get the scholarship from the database and increase view
         const scholarship = await Scholarships.findOneAndUpdate(
@@ -72,9 +73,6 @@ router.get('/:scholarshipID', async (req, res) => {
             console.log(`scholarshipID: ${scholarship._id} doesn't exist`);
             return res.status(404).json(createResponse(false, `scholarshipID: ${scholarship._id} doesn't exist`, null));
         }
-
-        // Convert scholarships to compact format with required fields
-
 
         // Return data
         res.status(200).json(createResponse(true, "Succesfuly return data", scholarship));
