@@ -2,7 +2,6 @@
 # 스꾸장학비서
 
 ## Overview
-
 TBD
 
 ## How to Run
@@ -43,7 +42,6 @@ http://localhost:8081
 
 
 ## License
-
 TBD
 
 ## Backend Developer

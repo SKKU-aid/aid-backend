@@ -4,6 +4,8 @@
 skku_notice/parsing/*.json
 skku_notice/*.json
 
+Backend/skku_notice/*.json
+
 ### Java ###
 # Compiled class file
 *.class
