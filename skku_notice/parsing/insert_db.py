@@ -35,6 +35,7 @@ try:
             else:
                 # Different applicationPeriod, overwrite the data at that _id
                 scholarship["_id"] = existing_doc["_id"]
+                scholarship["lastUploadedDate"] = existing_doc["uploadedDate"]
                 try:
                     collection.replace_one({"_id": existing_doc["_id"]}, scholarship)
                     print(f"Updated scholarship with _id {existing_doc['_id']}")
