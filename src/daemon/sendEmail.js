@@ -13,19 +13,19 @@ const getScholarshipsContent = (data) => {
     return (
         data.map(scholarship => `
         For more information, please refer to the site below.
-        ${data.link}
+        link: ${data.link}
 
-        장학금: ${scholarship.scholarshipName}
-        장학재단: ${scholarship.foundation}
-        장학종류: ${scholarship.scholarshipType}
-        선발인원: ${scholarship.numberOfRecipients}
-        장학혜택: ${scholarship.scholarshipAmount}
-        신청 기간: ${scholarship.applicationPeriod}
+        장학금: ${scholarship.scholarshipName || ""}
+        장학재단: ${scholarship.foundation || ""}
+        장학종류: ${scholarship.scholarshipType || ""}
+        선발인원: ${scholarship.numberOfRecipients || ""}
+        장학혜택: ${scholarship.scholarshipAmount || ""}
+        신청 기간: ${scholarship.applicationPeriod || ""}
         선발 대상: ${(scholarship.eligibleMajors || []).map(major => major).join(", ")}
         `.split('\n')
         .map(line => line.trim())
         .join('\n'))
-        .join('\n------------\n')
+        .join('\n------------------------\n')
     )
 }
 
@@ -46,11 +46,11 @@ const getEmailContent = (type, data) => {
             };
         case 'matchingScholarships':
             subject = 'Updated Info on Recommended Scholarships';
-            commonMessage = 'There is updated information regarding the recommended scholarship.';
+            commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
 
         case 'filteredScholarships':
             subject = 'The deadline for your saved scholarship is approaching.';
-            commonMessage = 'There are 3 days left until the deadline for the saved scholarship.';
+            commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
 
         default:
             return {
