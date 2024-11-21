@@ -44,7 +44,7 @@ async function sendSavedScholarshipsBeforDeadline() {
 }
 
 //execute function every 3days
-//cron.schedule('0 0 */3 * *',sendSavedScholarshipsBeforDeadline);
+cron.schedule('0 0 */3 * *',sendSavedScholarshipsBeforDeadline);
 
 //execute this function every one minute (for testing)
 // cron.schedule('* * * * *', sendSavedScholarshipsBeforDeadline);
