@@ -9,40 +9,66 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// const getEmailContent = (type) => {
-//   switch(type) {
-//     case '':
-//       return {
-//         subject: 'Welcome to our service!',
-//         text: 'Hello and welcome to our service. We are excited to have you!'
-//       };
-//     case 'order':
-//       return {
-//         subject: 'Your order has been confirmed',
-//         text: 'Thank you for your order. Your order will be processed shortly.',
-//         html: '<p>Thank you for your order. Your order will be processed shortly.</p>'
-//       };
-//     case 'reset-password':
-//       return {
-//         subject: 'Password Reset Request',
-//         text: 'Click the link below to reset your password.',
-//         html: '<p>Click the link below to reset your password:</p><a href="#">Reset Password</a>'
-//       };
-//     default:
-//       return {
-//         subject: 'Default Subject',
-//         text: 'This is the default email content.',
-//         html: '<p>This is the default email content.</p>'
-//       };
-//   }
-// };
+const getScholarshipsContent = (data) => {
+    return (
+        data.map(scholarship => `
+        For more information, please refer to the site below.
+        ${data.link}
 
+        장학금: ${scholarship.scholarshipName}
+        장학재단: ${scholarship.foundation}
+        장학종류: ${scholarship.scholarshipType}
+        선발인원: ${scholarship.numberOfRecipients}
+        장학혜택: ${scholarship.scholarshipAmount}
+        신청 기간: ${scholarship.applicationPeriod}
+        선발 대상: ${(scholarship.eligibleMajors || []).map(major => major).join(", ")}
+        `.split('\n')
+        .map(line => line.trim())
+        .join('\n'))
+        .join('\n------------\n')
+    )
+}
+
+
+// const subject = "SKKU Scholarship Verification Code";
+// const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
+const getEmailContent = (type, data) => {
+    switch(type) {
+        case 'verification':
+            return {
+                subject: 'SKKU Scholarship Verification Code',
+                text: `Please enter your verification code.
+                Verification Code:
+                ${data.verifyCode}
+                `.split('\n')
+                .map(line => line.trim())
+                .join('\n')
+            };
+        case 'matchingScholarships':
+            subject = 'Updated Info on Recommended Scholarships';
+            commonMessage = 'There is updated information regarding the recommended scholarship.';
+
+        case 'filteredScholarships':
+            subject = 'The deadline for your saved scholarship is approaching.';
+            commonMessage = 'There are 3 days left until the deadline for the saved scholarship.';
+
+        default:
+            return {
+                subject: subject,
+                text: commonMessage + getScholarshipsContent(data)
+            };
+    }
+};
+
+// data {email, type, content}
 const sendEmailNotification = (data) => {
+    const mail_data = getEmailContent(data.type, data.content);
+    console.log('Error ' + data.email);
     const mailOptions = {
         from: process.env.user,
         to: data.email,
-        subject: data.subject,
-        text: data.text
+        subject: mail_data.type,
+        text: mail_data.text
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

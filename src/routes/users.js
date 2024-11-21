@@ -76,13 +76,13 @@ router.post('/:userID/verify', async (req, res) => {
         }
 
         const verifyCode = generateVerificationCode();
+
         const email = user.userEmail;
-        const subject = "SKKU Scholarship Verification Code";
-        const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
+        const type = 'verification';
 
         await User.findOneAndUpdate({ userID: userID }, { $set: { verifyCode: verifyCode, verifyCodeCreatedAt: new Date() } });
 
-        sendEmailNotification({ email, subject, text });
+        sendEmailNotification({ email, type, content: { verifyCode } });
 
         res.status(200).json(createResponse(true, "verification code has been successfully generated", req.body));
     } catch (error) {

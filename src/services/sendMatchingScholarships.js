@@ -29,7 +29,7 @@ async function sendMatchingScholarships() {
         });
 
         for (const user of users) {
-            console.log('User Email:', user.userID);
+            console.log('User Email:', user.userEmail);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const matchingScholarships = recentlyUploadedScholarships.filter(buildMatchingScholarships(user));
