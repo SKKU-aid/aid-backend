@@ -15,13 +15,16 @@ const getScholarshipsContent = (data) => {
         For more information, please refer to the site below.
         link: ${data.link}
 
-        장학금: ${scholarship.scholarshipName || ""}
-        장학재단: ${scholarship.foundation || ""}
-        장학종류: ${scholarship.scholarshipType || ""}
-        선발인원: ${scholarship.numberOfRecipients || ""}
-        장학혜택: ${scholarship.scholarshipAmount || ""}
-        신청 기간: ${scholarship.applicationPeriod || ""}
-        선발 대상: ${(scholarship.eligibleMajors || []).map(major => major).join(", ")}
+        장학금: ${scholarship.scholarshipName || "알 수 없음"}
+        장학재단: ${scholarship.foundation || "알 수 없음"}
+        장학종류: ${scholarship.scholarshipType || "알 수 없음"}
+        선발인원: ${scholarship.numberOfRecipients || "알 수 없음"}
+        장학혜택: ${scholarship.scholarshipAmount || "알 수 없음"}
+        신청 기간: ${scholarship.applicationPeriod || "알 수 없음"}
+        선발 대상: ${(scholarship.eligibleMajors || []).length > 0 
+            ? scholarship.eligibleMajors.map(major => major).join(", ")
+            : "전공 무관"
+        }
         `.split('\n')
         .map(line => line.trim())
         .join('\n'))
@@ -44,11 +47,11 @@ const getEmailContent = (type, data) => {
                 .map(line => line.trim())
                 .join('\n')
             };
-        case 'matchingScholarships':
+        case 'sendMatchingScholarships':
             subject = 'Updated Info on Recommended Scholarships';
             commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
 
-        case 'filteredScholarships':
+        case 'sendSavedScholarshipsBeforeDeadline':
             subject = 'The deadline for your saved scholarship is approaching.';
             commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
 
