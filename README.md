@@ -1,10 +1,19 @@
+
 # 스꾸장학비서
 
 ## Overview
-
 TBD
 
-## How to Use Scrapy in This Project
+## How to Run
+
+mongodb with local host
+```bash
+docker-compose up -d
+docker exec -it backend bash
+```
+http://localhost:8081
+
+### How to Use Scrapy (scrap)
 
 1. Open `.\skku_notice\skku_notice\spiders\skku_notice_spider.py`.
 2. Set the `start_urls` variable to the domain you want to scrape.
@@ -12,37 +21,27 @@ TBD
 4. Run the following command to start scraping:
     ```bash
     cd skku_notice
-    scrapy crawl skku_notice -o notices.json
+    chmod +x crawl_script.sh
+    ./crawl_script.sh
     ```
 5. The scraped results will be stored in notices.json.
 
+### How to Use LangChain for Parsing
 
-## How to Run
+1. Ensure your `.env` file is correctly configured with your API keys and MongoDB URI.  
+2. Use the following script to parse the crawled data using LangChain:  
+    ```bash
+    python3 parsing/parsing_notices.py
+    ```  
+3. Save the parsed data (`response.json`) to the database:  
+    ```bash
+    python3 parsing/insert_db.py
+    ```  
 
-```bash
-git clone https://github.com/JihunSKKU/skku_scholarship_assistant.git
-cd skku_scholarship_assistant
-docker build -t ssa_image .
-docker run -it -v "$(pwd):/app" --name ssa_container ssa_image
-```
+**Note:** Make sure to verify the contents of `response.json` before running the database insertion script to ensure accuracy.
 
-OR if the Docker image and container have already been created:
-
-```bash
-docker run ssa_container
-docker exec -it ssa_container bash
-```
-
-mongodb with local host
-```bash
-docker-compose up -d
-```
-http://localhost:8081
-
-TBD
 
 ## License
-
 TBD
 
 ## Backend Developer
