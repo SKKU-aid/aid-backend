@@ -63,7 +63,6 @@ const getEmailContent = (type, data) => {
 // data {email, type, content}
 const sendEmailNotification = (data) => {
     const mail_data = getEmailContent(data.type, data.content);
-    console.log('Error ' + data.email);
     const mailOptions = {
         from: process.env.user,
         to: data.email,
