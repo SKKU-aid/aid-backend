@@ -72,12 +72,6 @@ class SkkuNoticeSpider(scrapy.Spider):
             else:
                 break
 
-        # Handle pagination only if the max notices limit hasn't been reached
-        if self.notice_counts[base_url] < self.max_notices:
-            next_page = response.css('a.page-next::attr(href)').get()
-            if next_page:
-                yield response.follow(next_page, callback=self.parse)
-
     def parse_notice(self, response):
         title = response.meta.get('title', 'Title not found')
         department = response.meta.get('department', 'Department not found')

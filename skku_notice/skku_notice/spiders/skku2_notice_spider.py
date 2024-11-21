@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import pymongo
 import scrapy
@@ -165,7 +166,22 @@ class SkkuNoticeSpider(scrapy.Spider):
                     return
                 
                 if link:
-                    full_link = response.urljoin(link)
+                    # 제거할 파라미터 이름 리스트
+                    remove_params = ["article.offset", "articleLimit", "srCategoryId1"]
+
+                    # 정규식 패턴 생성
+                    pattern = r'(&?({params})=[^&]*)'.format(params='|'.join(remove_params))
+
+                    # 불필요한 파라미터 제거
+                    cleaned_link = re.sub(pattern, '', link)
+
+                    # 중복된 '&' 정리 및 '?' 처리
+                    cleaned_link = re.sub(r'&&+', '&', cleaned_link)
+                    cleaned_link = cleaned_link.replace('?&', '?')
+                    cleaned_link = cleaned_link.rstrip('&')
+
+                    # full_link 생성 및 데이터 처리
+                    full_link = response.urljoin(cleaned_link)
                     self.notice_counts[base_url] += 1
                     try:
                         existing_doc = self.collection.find_one({"link": full_link})

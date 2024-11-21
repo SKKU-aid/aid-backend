@@ -41,12 +41,18 @@ class SkkuNoticeSpider(scrapy.Spider):
                 except ValueError:
                     self.log(f"Invalid date format: {start_date}")
                     continue
-                if (datetime.now() - _date).days > 90:
+                if (datetime.now() - _date).days > 60:
                     self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 90 days.")
                     return
                     
-                if link:                    
-                    full_link = response.urljoin(link)
+                if link:
+                    partial_link = link.split('?')[0]
+                    if "articleNo" in link:
+                        partial_link += '?' + '&'.join(
+                            [param for param in link.split('?')[1].split('&') if param.startswith('mode') or param.startswith('articleNo')]
+                        )
+                    
+                    full_link = response.urljoin(partial_link)
                     self.notice_counts[base_url] += 1
                     try:
                         existing_doc = self.collection.find_one({"link": full_link})

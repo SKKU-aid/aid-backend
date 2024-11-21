@@ -48,8 +48,8 @@ content가 Content not found인 경우에만 예외적으로 scholarshipName, li
     - Title: "DB 김준기문화재단 금융수리 장학생 모집" -> "DB 김준기문화재단 금융수리 장학생"
 2. `eligibleMajors`: 제출 대상이나 공지 대상을 보고 판단할 수도 있습니다. 대상 학과 목록이 없을 경우 null로 설정합니다.
     예:
-    - department: 신소재공학부 -> ["신소재공학부"]
     - department: 경제대학 -> ["경제대학"]
+    - department: 사회과학대학 -> ["사회과학대학"]
     - department가 없거나 자생스 행정실 등 -> content 내용보고 판단
     - 이공계열 -> ["이공계열"]
 3. `minimumGPARequirement`: 최소 학점이 정해져 있지 않은 경우 null로 설정합니다.
@@ -97,12 +97,12 @@ FORMAT:
     "eligibleMajors": "array or null",                // 지원 대상 학과 배열, 정보가 없으면 null
     "minimumGPARequirement": "number or null",        // 최소 학점 기준, 정보가 없으면 null
     "compTotalGPA": "boolean"                         // 총 학점 기준 여부
-    "eligibleSemesters": "string",                    // 추후에 전처리할 학기 및 학년 정보
+    "eligibleSemesters": "array (number)",            // 지원 대상 학기 및 학년 정보
     "scholarshipType": "string",                      // 장학금 유형
     "ageLimit": "number or null",                     // 나이 제한, 정보가 없으면 null
     "regionalRestrictions": "array or null",          // 지역 제한, 정보가 없으면 null
     "incomeLevelRequirement": "number or null",       // 소득분위 기준, 정보가 없으면 null
-    "applicationPeriod": "string",                    // 신청 기간 (예: "2024-01-01 ~ 2024-12-31")
+    "applicationPeriod": "string",                    // 신청 기간 (예: "2024-01-01 ~ 2024-12-31") - 앞에는 반드시 start_date로 작성
     "scholarshipAmount": "string or null",            // 장학금 금액, 정보가 없으면 null
     "numberOfRecipients": "integer",                  // 선발 인원, 정보가 없으면 null
     "requiredDocuments": "array or null",             // 제출 서류 배열, 정보가 없으면 null
