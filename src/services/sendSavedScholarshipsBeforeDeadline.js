@@ -34,7 +34,7 @@ async function sendSavedScholarshipsBeforDeadline() {
 
             //Todo
             //Send Email to user, Use filteredScholarships for implementation
-            sendEmailNotification({ email: user.userEmail, typ: '', content: 'filteredScholarships', content: filteredScholarships });
+            sendEmailNotification({ email: user.userEmail, type: 'filteredScholarships', content: filteredScholarships });
         }
 
     } catch (error) {

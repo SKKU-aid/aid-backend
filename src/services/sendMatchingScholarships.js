@@ -39,7 +39,7 @@ async function sendMatchingScholarships() {
             console.log('matchingScholarships:', matchingScholarships);
             //Todo
             //Send Email to user, Use matchingScholarships for implementation
-            sendEmailNotification({ email: user.userEmail, typ: 'matchingScholarships', content: matchingScholarships });
+            sendEmailNotification({ email: user.userEmail, type: 'matchingScholarships', content: matchingScholarships });
 
 
         }
