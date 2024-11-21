@@ -16,7 +16,7 @@ class SkkuNoticeSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super(SkkuNoticeSpider, self).__init__(*args, **kwargs)
-        self.mongo_client = pymongo.MongoClient(os.getenv("MONGO_URI"))
+        self.mongo_client = pymongo.MongoClient(os.getenv("MONGODB_URI"))
         self.db = self.mongo_client["db"]
         self.collection = self.db["scholarships"]
         

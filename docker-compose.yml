@@ -12,7 +12,7 @@ services:
       - .:/app
     tty: true
     environment:
-      MONGO_URI: "${MONGO_URI}"
+      MONGODB_URI: "${MONGODB_URI}"
     
   mongo-express:
     image: mongo-express:0.54.0
@@ -21,4 +21,4 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_URI: "${MONGO_URI}"
+      ME_CONFIG_MONGODB_URI: "${MONGODB_URI}"
