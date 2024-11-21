@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
         const user_exist = await User.findOne({ userID: userID });
 
         if (user_exist !== null) {
-            return res.status(404).json(createResponse(false, "This userID already exists", null));
+            return res.status(409).json(createResponse(false, "This userID already exists", null));
         }
 
         const user = await User.create(req.body);
@@ -31,19 +31,17 @@ router.post('/', async (req, res) => {
 router.get('/checkID', async (req, res) => {
     try {
         // Extract userID from the route parameter
-        const {
-            userID
-        } = req.body;
+        const userID = req.query.userID;
         console.log('User ID:', userID); // For debugging
 
         if (!userID) {
-            return res.status(404).json(createResponse(false, "userID is empty", null));
+            return res.status(400).json(createResponse(false, "userID is empty", null));
         }
         
         const user = await User.findOne({ userID: userID });
 
         if (user !== null) {
-            return res.status(404).json(createResponse(false, "This userID already exists", null));
+            return res.status(409).json(createResponse(false, "This userID already exists", null));
         }
         res.status(200).json(createResponse(true, "This userID is available", user));
     } catch (error) {
