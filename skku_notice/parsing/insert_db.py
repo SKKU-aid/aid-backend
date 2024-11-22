@@ -20,8 +20,6 @@ try:
 
     max_id_document = collection.find_one(sort=[("_id", -1)])
     max_id = max_id_document["_id"] if max_id_document else 0
-
-    print(f"Current max _id in database: {max_id}")
             
     for scholarship in scholarship_data:
         # Find if there's an existing document with the same link
@@ -35,6 +33,7 @@ try:
             else:
                 # Different applicationPeriod, overwrite the data at that _id
                 scholarship["_id"] = existing_doc["_id"]
+                scholarship["views"] = existing_doc["views"]
                 scholarship["lastUploadedDate"] = existing_doc["uploadedDate"]
                 try:
                     collection.replace_one({"_id": existing_doc["_id"]}, scholarship)

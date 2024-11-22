@@ -97,7 +97,7 @@ FORMAT:
     "eligibleMajors": "array or null",                // 지원 대상 학과 배열, 정보가 없으면 null
     "minimumGPARequirement": "number or null",        // 최소 학점 기준, 정보가 없으면 null
     "compTotalGPA": "boolean"                         // 총 학점 기준 여부
-    "eligibleSemesters": "array (number)",            // 지원 대상 학기 및 학년 정보
+    "eligibleSemesters": "array (number) or null",    // 지원 대상 학기 및 학년 정보
     "scholarshipType": "string",                      // 장학금 유형
     "ageLimit": "number or null",                     // 나이 제한, 정보가 없으면 null
     "regionalRestrictions": "array or null",          // 지역 제한, 정보가 없으면 null
