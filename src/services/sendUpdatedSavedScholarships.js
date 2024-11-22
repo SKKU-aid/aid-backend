@@ -37,7 +37,9 @@ async function sendUpdatedSavedScholarships() {
             });
 
             //Send Email to user, Use filteredScholarships for implementation
-            sendEmailNotification({ email: user.userID, type: 'sendUpdatedSavedScholarships', content: filteredScholarships });
+            if (filteredScholarships.length !==  0) {
+                sendEmailNotification({ email: user.userID, type: 'sendUpdatedSavedScholarships', content: filteredScholarships });
+            }
         }
 
         //if updatedScholarships exist update DB

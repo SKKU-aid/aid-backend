@@ -13,7 +13,7 @@ const getScholarshipsContent = (data) => {
     return (
         data.map(scholarship => `
         For more information, please refer to the site below.
-        link: ${data.link}
+        link: ${data.link || "알 수 없음"}
 
         장학금: ${scholarship.scholarshipName || "알 수 없음"}
         장학재단: ${scholarship.foundation || "알 수 없음"}
@@ -52,9 +52,13 @@ const getEmailContent = (type, data) => {
             commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
 
         case 'sendSavedScholarshipsBeforeDeadline':
-            subject = 'The deadline for your saved scholarship is approaching.';
+            subject = 'The deadline for your saved scholarship is approaching';
             commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
-
+        
+        case 'sendUpdatedSavedScholarships':
+            subject = 'Updated Info for your saved Scholarships';
+            commonMessage = 'There is updated information regarding the saved scholarship.\n\n';
+        
         default:
             return {
                 subject: subject,
@@ -69,7 +73,7 @@ const sendEmailNotification = (data) => {
     const mailOptions = {
         from: process.env.user,
         to: data.email,
-        subject: mail_data.type,
+        subject: mail_data.subject,
         text: mail_data.text
     };
 

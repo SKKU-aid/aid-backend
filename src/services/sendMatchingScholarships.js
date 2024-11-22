@@ -39,7 +39,9 @@ async function sendMatchingScholarships() {
             console.log('matchingScholarships:', matchingScholarships);
             //Todo
             //Send Email to user, Use matchingScholarships for implementation
-            sendEmailNotification({ email: user.userID, type: 'sendMatchingScholarships', content: matchingScholarships });
+            if (matchingScholarships.length !==  0) {
+                sendEmailNotification({ email: user.userID, type: 'sendMatchingScholarships', content: matchingScholarships });
+            }
         }
 
     } catch (error) {
