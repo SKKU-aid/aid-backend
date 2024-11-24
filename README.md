@@ -22,7 +22,6 @@ Follow these steps to set up and run the API and MongoDB servers in Docker.
 
 2. Install Dependencies in the Backend Container
     ```bash
-    docker exec -it backend bash
     npm install
     ```
 
