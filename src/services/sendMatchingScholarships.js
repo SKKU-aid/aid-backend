@@ -9,7 +9,6 @@ const compactScholarship = require('../utils/compactScholarship.js');
 const buildMatchingScholarships = require('../utils/buildMatchingScholarships.js');
 const sendEmailNotification=require('../daemon/sendEmail.js');
 
-
 async function sendMatchingScholarships() {
     const today = new Date();
     const threeDaysAgo = new Date(today);
@@ -19,7 +18,6 @@ async function sendMatchingScholarships() {
     try {
         // get users and scholarships info
         const users = await User.find();
-        
         const scholarships = await Scholarships.find();
 
         const recentlyUploadedScholarships = scholarships.filter(scholarship => {
@@ -43,7 +41,6 @@ async function sendMatchingScholarships() {
                 sendEmailNotification({ email: user.userID, type: 'sendMatchingScholarships', content: matchingScholarships });
             }
         }
-
     } catch (error) {
         console.error('Error occur: ', error);
         return;

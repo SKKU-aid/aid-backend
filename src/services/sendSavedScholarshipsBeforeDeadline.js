@@ -16,7 +16,6 @@ async function sendSavedScholarshipsBeforDeadline() {
     try {
         // get users and scholarships info
         const users = await User.find();
-
         const scholarships = await Scholarships.find();
 
         for (const user of users) {

@@ -156,6 +156,7 @@ class SkkuNoticeSpider(scrapy.Spider):
                 department = notice.css('dd.board-list-content-info li:nth-child(2)::text').get(default='Department not found').strip()
                 if "자생스 행정실" in department:
                     continue
+
                 start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
                 
                 try:
@@ -172,6 +173,7 @@ class SkkuNoticeSpider(scrapy.Spider):
                     remove_params = ["article.offset", "articleLimit", "srCategoryId1"]
                     pattern = r'(&?({params})=[^&]*)'.format(params='|'.join(remove_params))
                     cleaned_link = re.sub(pattern, '', link)
+
                     cleaned_link = re.sub(r'&&+', '&', cleaned_link)
                     cleaned_link = cleaned_link.replace('?&', '?')
                     cleaned_link = cleaned_link.rstrip('&')

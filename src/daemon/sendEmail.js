@@ -14,7 +14,6 @@ const getScholarshipsContent = (data) => {
         data.map(scholarship => `
         For more information, please refer to the site below.
         link: ${data.link || "알 수 없음"}
-
         장학금: ${scholarship.scholarshipName || "알 수 없음"}
         장학재단: ${scholarship.foundation || "알 수 없음"}
         장학종류: ${scholarship.scholarshipType || "알 수 없음"}
@@ -58,7 +57,7 @@ const getEmailContent = (type, data) => {
         case 'sendUpdatedSavedScholarships':
             subject = 'Updated Info for your saved Scholarships';
             commonMessage = 'There is updated information regarding the saved scholarship.\n\n';
-        
+
         default:
             return {
                 subject: subject,
