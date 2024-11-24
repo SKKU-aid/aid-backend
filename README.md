@@ -17,6 +17,7 @@ Follow these steps to set up and run the API and MongoDB servers in Docker.
 
 1. Open a terminal in the project directory and run the following command to start all containers in the background:
     ```bash
+    docker-compose up -d
     docker exec -it backend bash
     ```
 
@@ -31,6 +32,13 @@ Follow these steps to set up and run the API and MongoDB servers in Docker.
     ```
 
 4. Once the API server is running, you can access it at [http://localhost:8082](http://localhost:8082) in your web browser.
+
+5. In the project directory, ensure you have a .env file containing the following:
+    ```bash
+    MONGODB_URI=mongodb://<user>:<password>@localhost:27017/<database>
+    ```
+    Replace <user>, <password>, and <database> with the appropriate values. If you're unsure about the MONGODB_URI details, please contact the contributor for assistance.
+
 
 ### How to Use Scrapy (scrap)
 
