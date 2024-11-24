@@ -10,7 +10,28 @@ mongodb with local host
 docker-compose up -d
 docker exec -it backend bash
 ```
-http://localhost:8081
+
+### How to Run the Test API Server and Database Server
+
+Follow these steps to set up and run the API and MongoDB servers in Docker.
+
+1. Open a terminal in the project directory and run the following command to start all containers in the background:
+    ```bash
+    docker exec -it backend bash
+    ```
+
+2. Install Dependencies in the Backend Container
+    ```bash
+    docker exec -it backend bash
+    npm install
+    ```
+
+3. Start the API Server. In the backend container, start the API server by running:
+    ```bash
+    node app.js
+    ```
+
+4. Once the API server is running, you can access it at [http://localhost:8082](http://localhost:8082) in your web browser.
 
 ### How to Use Scrapy (scrap)
 
