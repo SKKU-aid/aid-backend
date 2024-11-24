@@ -20,7 +20,8 @@ const scholarshipsSchema = mongoose.Schema({
     link: { type: String, required: true },
     views: { type: Number, required: true },
     foundation: { type: String, required: true },
-    uploadedDate: { type: Date, required: true }
+    uploadedDate: { type: Date, required: true },
+    lastUploadedDate: { type: Date, default: null }
 });
 
 const Scholarships = mongoose.model("Scholarships", scholarshipsSchema);

@@ -9,37 +9,49 @@ const compactScholarship = require('../utils/compactScholarship.js');
 const sendEmailNotification = require('../daemon/sendEmail.js');
 
 
-async function sendSavedScholarshipsBeforDeadline() {
+async function sendUpdatedSavedScholarships() {
     const today = new Date();
-    console.log('sendSavedScholarshipsBeforDeadline running at:', today.toDateString());
+    console.log('sendUpdatedSavedScholarships running at:', today.toDateString());
 
     try {
         // get users and scholarships info
         const users = await User.find();
+
         const scholarships = await Scholarships.find();
 
+        let updatedScholarships = new Set();
         for (const user of users) {
             console.log('User Email:', user.userID);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const filteredScholarships = scholarships.filter(scholarship => {
                 const isSaved = user.savedScholarship.includes(scholarship._id);
-                if (!scholarship.applicationPeriod) {
-                    return false;
-                }
-                const [start, end] = scholarship.applicationPeriod.split('~').map(date => new Date(date.trim()));
-                const timeDifference = end - today; // Difference in milliseconds
-                const daysDifference = timeDifference / (1000 * 60 * 60 * 24); // Convert milliseconds to days
-
+                const isUpdated = scholarship.lastUploadedDate !== null && scholarship.lastUploadedDate !== scholarship.uploadedDate;
                 // Return true if scholarship is saved and due date is within 3 days
-                return isSaved && daysDifference < 3 && daysDifference >= 0;
+                return isSaved && isUpdated
             });
 
-            //Todo
+            //add _id of filteredScholarships into updatedScholarships
+            filteredScholarships.forEach(element => {
+                updatedScholarships.add(element._id);
+            });
+
             //Send Email to user, Use filteredScholarships for implementation
             if (filteredScholarships.length !==  0) {
-                sendEmailNotification({ email: user.userID, type: 'sendSavedScholarshipsBeforeDeadline', content: filteredScholarships });
+                sendEmailNotification({ email: user.userID, type: 'sendUpdatedSavedScholarships', content: filteredScholarships });
             }
+        }
+
+        //if updatedScholarships exist update DB
+        if(updatedScholarships.size>0){
+            const updateResult=await Scholarships.updateMany(
+                {_id:{$in: Array.from(updatedScholarships)}},
+                {$set:{lastUploadedDate:"$uploadedDate"}}
+            )
+            console.log(`${updateResult.modifiedCount} scholarships updated successfully.`);
+        }
+        else {
+            console.log("No scholarships required updating.");
         }
 
     } catch (error) {
@@ -49,9 +61,9 @@ async function sendSavedScholarshipsBeforDeadline() {
 }
 
 //execute function everyday at 22:00
-cron.schedule('0 22 * * *', sendSavedScholarshipsBeforDeadline);
+cron.schedule('0 22 * * *', sendUpdatedSavedScholarships);
 
 //execute this function every one minute (for testing)
-// cron.schedule('* * * * *', sendSavedScholarshipsBeforDeadline);
+// cron.schedule('* * * * *', sendUpdatedSavedScholarships);
 
-module.exports = sendSavedScholarshipsBeforDeadline;
+module.exports = sendUpdatedSavedScholarships;

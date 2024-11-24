@@ -42,7 +42,7 @@ class SkkuNoticeSpider(scrapy.Spider):
                     self.log(f"Invalid date format: {start_date}")
                     continue
                 if (datetime.now() - _date).days > 60:
-                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 90 days.")
+                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 60 days.")
                     return
                     
                 if link:

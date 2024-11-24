@@ -154,6 +154,9 @@ class SkkuNoticeSpider(scrapy.Spider):
                     self.log(f"Skipping: {title} (Korea Scholarship Foundation)")
                     continue
                 department = notice.css('dd.board-list-content-info li:nth-child(2)::text').get(default='Department not found').strip()
+                if "자생스 행정실" in department:
+                    continue
+
                 start_date = notice.css('dd.board-list-content-info li:nth-child(3)::text').get(default='Start date not found').strip()
                 
                 try:
@@ -162,25 +165,19 @@ class SkkuNoticeSpider(scrapy.Spider):
                     self.log(f"Invalid date format: {start_date}")
                     continue
                 if (datetime.now() - _date).days > 60:
-                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 90 days.")
+                    self.log(f"Stopping crawl for {base_url}: Start date ({start_date}) is older than 60 days.")
                     return
                 
                 if link:
-                    # 제거할 파라미터 이름 리스트
+                    # Remove unnecessary parameters from the URL
                     remove_params = ["article.offset", "articleLimit", "srCategoryId1"]
-
-                    # 정규식 패턴 생성
                     pattern = r'(&?({params})=[^&]*)'.format(params='|'.join(remove_params))
-
-                    # 불필요한 파라미터 제거
                     cleaned_link = re.sub(pattern, '', link)
 
-                    # 중복된 '&' 정리 및 '?' 처리
                     cleaned_link = re.sub(r'&&+', '&', cleaned_link)
                     cleaned_link = cleaned_link.replace('?&', '?')
                     cleaned_link = cleaned_link.rstrip('&')
 
-                    # full_link 생성 및 데이터 처리
                     full_link = response.urljoin(cleaned_link)
                     self.notice_counts[base_url] += 1
                     try:
