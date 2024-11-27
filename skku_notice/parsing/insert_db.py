@@ -44,6 +44,7 @@ try:
             # No existing document with the same link, insert as new document
             max_id += 1
             scholarship["_id"] = max_id
+            scholarship["lastUploadedDate"] = None
             try:
                 collection.insert_one(scholarship)
                 print(f"Inserted new scholarship with _id {scholarship['_id']}")
