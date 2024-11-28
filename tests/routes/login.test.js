@@ -1,7 +1,7 @@
 const request = require('supertest'); // For making HTTP requests
 const express = require('express');  // Express app for mocking
 const User = require('../../src/models/User'); // Mocked User model
-const loginRouter = require('../../src/routes/users'); // Router to test
+const loginRouter = require('../../src/routes/login'); // Router to test
 const createResponse = require('../../src/utils/responseTemplate');
 
 // Mock the Express app
