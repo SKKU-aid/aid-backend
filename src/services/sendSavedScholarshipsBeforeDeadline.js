@@ -19,7 +19,7 @@ async function sendSavedScholarshipsBeforDeadline() {
         const scholarships = await Scholarships.find();
 
         for (const user of users) {
-            console.log('User Email:', user.userID);
+            console.log('User Email:', user.userEmail);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const filteredScholarships = scholarships.filter(scholarship => {
@@ -37,8 +37,8 @@ async function sendSavedScholarshipsBeforDeadline() {
 
             //Todo
             //Send Email to user, Use filteredScholarships for implementation
-            if (filteredScholarships.length !==  0) {
-                sendEmailNotification({ email: user.userID, type: 'sendSavedScholarshipsBeforeDeadline', content: filteredScholarships });
+            if (filteredScholarships.length !== 0) {
+                sendEmailNotification({ email: user.userEmail, type: 'sendSavedScholarshipsBeforeDeadline', content: filteredScholarships });
             }
         }
 
