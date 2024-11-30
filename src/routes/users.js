@@ -130,6 +130,40 @@ router.post('/:userID/check-verify', async (req, res) => {
 });
 
 // updateUserPassWord
+router.put('/:userID/change-pw', async (req, res) => {
+    try {
+        // Extract user info from the route parameter
+        const {
+            userID,
+            verifyCode,
+            updatePassword
+        } = req.body;
+        console.log('User ID:', userID); // For debugging
+
+        // Retrieve user with necessary fields
+        const user = await User.findOne({ userID: userID });
+
+        // Check if user is null (not found in the database)
+        if (!user) {
+            console.error(`User with user_id: ${userID} doesn't exist`);
+            return res.status(404).json(createResponse(false, "userID doesn't exist in DB", null));
+        }
+
+        if (!user.verifyCode || !user.verifyCodeCreatedAt || user.verifyCode != verifyCode) {
+            return res.status(404).json(createResponse(false, "verificataion code is wrong", null));
+        }
+
+
+        await User.findOneAndUpdate({ userID: userID }, { userPassword: updatePassword });
+
+        res.status(200).json(createResponse(true, "user password has been successfully updated", null));
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json(createResponse(false, "Failed to retrieve user", null));
+    }
+});
+
+// updateUserPassWord
 router.put('/:userID/update-pw', async (req, res) => {
     try {
         // Extract user info from the route parameter
@@ -163,7 +197,6 @@ router.put('/:userID/update-pw', async (req, res) => {
         res.status(500).json(createResponse(false, "Failed to retrieve user", null));
     }
 });
-
 
 //It return data right form
 // getRecommandedScholarshipInfo
