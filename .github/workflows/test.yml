@@ -3,10 +3,10 @@ name: CI - Jest Tests
 on:
   push:
     branches:
-      - feat/CICD
+      - main
   pull_request:
     branches:
-      - feat/CICD
+      - main
 
 jobs:
   test:
