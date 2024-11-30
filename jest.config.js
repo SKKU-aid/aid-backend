@@ -4,5 +4,5 @@ module.exports = {
   verbose: true,
   collectCoverage: true,
   coverageDirectory: 'coverage',
-  setupFiles: ['/app/jest.setup.js'],
+  setupFiles: ['<rootDir>/jest.setup.js'],
 };
