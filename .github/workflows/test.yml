@@ -1,9 +1,6 @@
 name: CI - Jest Tests
 
 on:
-  push:
-    branches:
-      - feat/codecov
   pull_request:
     branches:
       - main
