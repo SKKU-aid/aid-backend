@@ -4,6 +4,62 @@ jest.mock('nodemailer');
 
 const nodemailer = require('nodemailer');
 const sendEmailNotification = require('../../src/daemon/sendEmail');
+const getScholarshipsContent = sendEmailNotification.getScholarshipsContent;
+
+describe('getScholarshipsContent', () => {
+  it('should generate content with all fields present', () => {
+    const data = [
+      {
+        link: 'http://example.com',
+        scholarshipName: 'Scholarship A',
+        foundation: 'Foundation A',
+        scholarshipType: 'Type A',
+        numberOfRecipients: 10,
+        scholarshipAmount: '$1000',
+        applicationPeriod: '2023-01-01 ~ 2023-12-31',
+        eligibleMajors: ['Engineering', 'Science'],
+      },
+    ];
+
+    const result = getScholarshipsContent(data);
+
+    expect(result).toContain('장학금: Scholarship A');
+    expect(result).toContain('장학재단: Foundation A');
+    expect(result).toContain('장학종류: Type A');
+    expect(result).toContain('선발인원: 10');
+    expect(result).toContain('장학혜택: $1000');
+    expect(result).toContain('신청 기간: 2023-01-01 ~ 2023-12-31');
+    expect(result).toContain('선발 대상: Engineering, Science');
+  });
+
+  it('should use default values when fields are missing', () => {
+    const data = [
+      {},
+    ];
+
+    const result = getScholarshipsContent(data);
+
+    expect(result).toContain('장학금: 알 수 없음');
+    expect(result).toContain('장학재단: 알 수 없음');
+    expect(result).toContain('장학종류: 알 수 없음');
+    expect(result).toContain('선발인원: 알 수 없음');
+    expect(result).toContain('장학혜택: 알 수 없음');
+    expect(result).toContain('신청 기간: 알 수 없음');
+    expect(result).toContain('선발 대상: 전공 무관');
+  });
+
+  it('should handle empty eligibleMajors array', () => {
+    const data = [
+      {
+        eligibleMajors: [],
+      },
+    ];
+
+    const result = getScholarshipsContent(data);
+
+    expect(result).toContain('선발 대상: 전공 무관');
+  });
+});
 
 describe('sendEmailNotification', () => {
   let sendMailMock;
@@ -156,5 +212,17 @@ describe('sendEmailNotification', () => {
     sendEmailNotification(data);
 
     expect(console.log).toHaveBeenCalledWith('Error sending email: ', expect.any(Error));
+  });
+
+  it('should throw an error for unknown email type', () => {
+    const data = {
+      email: 'user@example.com',
+      type: 'unknownType',
+      content: {},
+    };
+
+    expect(() => {
+      sendEmailNotification(data);
+    }).toThrowError(`Unknown email type: ${data.type}`);
   });
 });

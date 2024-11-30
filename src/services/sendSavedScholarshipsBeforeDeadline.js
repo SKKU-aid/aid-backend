@@ -8,7 +8,6 @@ const createListResponse = require('../utils/responseListTemplate.js');
 const compactScholarship = require('../utils/compactScholarship.js');
 const sendEmailNotification = require('../../src/daemon/sendEmail.js');
 
-
 async function sendSavedScholarshipsBeforDeadline() {
     const today = new Date();
     console.log('sendSavedScholarshipsBeforDeadline running at:', today.toDateString());

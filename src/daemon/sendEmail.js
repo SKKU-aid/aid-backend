@@ -27,9 +27,6 @@ const getScholarshipsContent = (data) => {
 // const subject = "SKKU Scholarship Verification Code";
 // const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
 const getEmailContent = (type, data) => {
-    let subject;
-    let commonMessage;
-
     switch(type) {
         case 'verification':
             return {
@@ -42,26 +39,29 @@ const getEmailContent = (type, data) => {
                 .join('\n')
             };
         case 'sendMatchingScholarships':
-            subject = 'Updated Info on Recommended Scholarships';
-            commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
-            break;
+            const subjectMatching = 'Updated Info on Recommended Scholarships';
+            const commonMessageMatching = 'There is updated information regarding the recommended scholarship.\n\n';
+            return {
+                subject: subjectMatching,
+                text: commonMessageMatching + getScholarshipsContent(data)
+            };
         case 'sendSavedScholarshipsBeforeDeadline':
-            subject = 'The deadline for your saved scholarship is approaching';
-            commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
-            break;
+            const subjectDeadline = 'The deadline for your saved scholarship is approaching';
+            const commonMessageDeadline = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
+            return {
+                subject: subjectDeadline,
+                text: commonMessageDeadline + getScholarshipsContent(data)
+            };
         case 'sendUpdatedSavedScholarships':
-            subject = 'Updated Info for your saved Scholarships';
-            commonMessage = 'There is updated information regarding the saved scholarship.\n\n';
-            break;
+            const subjectUpdated = 'Updated Info for your saved Scholarships';
+            const commonMessageUpdated = 'There is updated information regarding the saved scholarship.\n\n';
+            return {
+                subject: subjectUpdated,
+                text: commonMessageUpdated + getScholarshipsContent(data)
+            };
         default:
-            subject = 'Default Subject';
-            commonMessage = '';
+            throw new Error(`Unknown email type: ${type}`);
     }
-
-    return {
-        subject: subject,
-        text: commonMessage + getScholarshipsContent(data)
-    };
 };
 
 // data {email, type, content}
@@ -92,4 +92,5 @@ const sendEmailNotification = (data) => {
     });
 };
 
-module.exports = sendEmailNotification
+module.exports = sendEmailNotification;
+module.exports.getScholarshipsContent = getScholarshipsContent;

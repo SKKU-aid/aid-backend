@@ -31,9 +31,9 @@ router.get('/', async (req, res) => {
 
         // Get scholarships from the database
         const scholarships = await Scholarships.find();
-        if (!scholarships) {
-            return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
-        }
+        // if (!scholarships) {
+        //     return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
+        // }
 
         // Convert scholarships to compact format with required fields
         const compactScholarships = scholarships.map(scholarships => compactScholarship(scholarships, savedScholarshipIDs));

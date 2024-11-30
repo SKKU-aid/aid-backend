@@ -118,6 +118,8 @@ describe('Scholarship Routes', () => {
       );
     });
 
+    
+
     it('should handle scholarship not found', async () => {
       const scholarshipID = 1;
       const userID = 'exampleUser';
