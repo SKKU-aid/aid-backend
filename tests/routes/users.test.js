@@ -447,6 +447,36 @@ describe('User Routes', () => {
       );
     });
 
+    it('should return recommended scholarships successfully when savedScholarship is undefined', async () => {
+      const userID = 'exampleUser';
+      const type = 'custom';
+      const user = {
+        // savedScholarship가 undefined인 경우
+        birthday: '1990-01-01',
+      };
+      const scholarships = [
+        { _id: 1, title: 'Scholarship 1' },
+        { _id: 2, title: 'Scholarship 2' },
+      ];
+      User.findOne.mockResolvedValue(user);
+      Scholarship.find.mockResolvedValue(scholarships);
+      buildMatchingScholarships.mockReturnValue(() => true);
+      compactScholarship.mockImplementation((scholarship, savedScholarshipIDs) => ({
+        _id: scholarship._id,
+        title: scholarship.title,
+        isFav: false,
+      }));
+      const response = await request(app).get(`/${userID}/scholarships`).query({ type });
+    
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "Succesfuly return data", [
+          { _id: 1, title: 'Scholarship 1', isFav: false },
+          { _id: 2, title: 'Scholarship 2', isFav: false },
+        ])
+      );
+    });    
+
     it('should return 400 if type is not custom', async () => {
       const userID = 'exampleUser';
       const type = 'other';
@@ -509,6 +539,63 @@ describe('User Routes', () => {
       );
     });
 
+    it('should return empty list when savedScholarship is undefined', async () => {
+      const userID = 'exampleUser';
+      const user = {
+        // savedScholarship가 undefined인 경우
+      };
+      User.findOne.mockResolvedValue(user);
+      Scholarship.find.mockResolvedValue([]);
+      const response = await request(app).get(`/${userID}/fav-scholarships`);
+    
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "fail to get scholarships from DB", null)
+      );
+    });    
+
+    it('should add scholarship to favorites when savedScholarship is undefined', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        scholarshipID: 1,
+      };
+      const user = {
+        // savedScholarship가 undefined인 경우
+      };
+      User.findOne.mockResolvedValue(user);
+      User.findOneAndUpdate.mockResolvedValue();
+    
+      const response = await request(app).post(`/${requestBody.userID}/fav-scholarships`).send(requestBody);
+    
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "Favorite scholarships has been successfully deleted", null)
+      );
+    
+      expect(User.findOneAndUpdate).toHaveBeenCalledWith(
+        { userID: requestBody.userID },
+        { savedScholarship: [requestBody.scholarshipID] }
+      );
+    });
+
+    it('should return 404 when trying to delete from empty savedScholarship', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        scholarshipID: 1,
+      };
+      const user = {
+        // savedScholarship가 undefined인 경우
+      };
+      User.findOne.mockResolvedValue(user);
+    
+      const response = await request(app).delete(`/${requestBody.userID}/fav-scholarships`).send(requestBody);
+    
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "Favorite scholarship does not exit", null)
+      );
+    });    
+    
     it('should return 404 if user not found', async () => {
       const userID = 'nonexistentUser';
       
