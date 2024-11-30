@@ -78,11 +78,16 @@ describe('User Routes', () => {
       const userID = 'nonexistentUser';
       const updateData = { name: 'Jane Doe' };
       User.findOne.mockResolvedValue(null);
-      const response = await request(app).put(`/${userID}/update-info`).send(updateData);
+  
+      const response = await request(app)
+        .put(`/${userID}/update-info`)
+        .send(updateData);
+  
       expect(response.status).toBe(404);
       expect(response.body).toEqual(
         createResponse(false, "userID doesn't exist in DB", null)
       );
+      expect(User.findOne).toHaveBeenCalledWith({ userID: userID });
     });
 
     it('should handle errors', async () => {
@@ -205,6 +210,119 @@ describe('User Routes', () => {
       expect(response.body).toEqual(
         createResponse(false, "Failed to retrieve user", null)
       );
+    });
+  });
+
+  describe('PUT /:userID/change-pw', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    it('should update user password successfully when verifyCode is correct', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        verifyCode: 'validCode123',
+        updatePassword: 'newPassword',
+      };
+      const user = {
+        userID: 'exampleUser',
+        verifyCode: 'validCode123',
+        verifyCodeCreatedAt: new Date(),
+      };
+      User.findOne.mockResolvedValue(user);
+      User.findOneAndUpdate.mockResolvedValue();
+  
+      const response = await request(app).put(`/${requestBody.userID}/change-pw`).send(requestBody);
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "user password has been successfully updated", null)
+      );
+      expect(User.findOne).toHaveBeenCalledWith({ userID: requestBody.userID });
+      expect(User.findOneAndUpdate).toHaveBeenCalledWith(
+        { userID: requestBody.userID },
+        { userPassword: requestBody.updatePassword }
+      );
+    });
+  
+    it('should return 404 if user not found', async () => {
+      const requestBody = {
+        userID: 'nonexistentUser',
+        verifyCode: 'validCode123',
+        updatePassword: 'newPassword',
+      };
+      User.findOne.mockResolvedValue(null);
+  
+      const response = await request(app).put(`/${requestBody.userID}/change-pw`).send(requestBody);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "userID doesn't exist in DB", null)
+      );
+      expect(User.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+  
+    it('should return 404 if verification code is wrong', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        verifyCode: 'wrongCode',
+        updatePassword: 'newPassword',
+      };
+      const user = {
+        userID: 'exampleUser',
+        verifyCode: 'validCode123',
+        verifyCodeCreatedAt: new Date(),
+      };
+      User.findOne.mockResolvedValue(user);
+  
+      const response = await request(app).put(`/${requestBody.userID}/change-pw`).send(requestBody);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "verification code is wrong", null)
+      );
+      expect(User.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+  
+    it('should return 404 if verification code or createdAt is missing', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        verifyCode: 'validCode123',
+        updatePassword: 'newPassword',
+      };
+      const user = {
+        userID: 'exampleUser',
+        // verifyCode: 'validCode123', // 누락된 경우
+        // verifyCodeCreatedAt: new Date(), // 누락된 경우
+      };
+      User.findOne.mockResolvedValue(user);
+  
+      const response = await request(app).put(`/${requestBody.userID}/change-pw`).send(requestBody);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "verification code is wrong", null)
+      );
+      expect(User.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+  
+    it('should handle errors and return 500', async () => {
+      const requestBody = {
+        userID: 'exampleUser',
+        verifyCode: 'validCode123',
+        updatePassword: 'newPassword',
+      };
+      User.findOne.mockImplementation(() => {
+        throw new Error('Database error');
+      });
+  
+      const response = await request(app).put(`/${requestBody.userID}/change-pw`).send(requestBody);
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual(
+        createResponse(false, "Failed to retrieve user", null)
+      );
+      expect(User.findOneAndUpdate).not.toHaveBeenCalled();
     });
   });
 
@@ -374,11 +492,31 @@ describe('User Routes', () => {
 
     it('should return 404 if user not found', async () => {
       const userID = 'nonexistentUser';
+      
       User.findOne.mockResolvedValue(null);
+  
       const response = await request(app).get(`/${userID}/fav-scholarships`);
+  
       expect(response.status).toBe(404);
       expect(response.body).toEqual(
         createResponse(false, `userID: ${userID} doesn't exist`, null)
+      );
+      expect(User.findOne).toHaveBeenCalledWith({ userID: userID }, 'savedScholarship');
+    });
+
+    it('should return 404 if scholarships not found', async () => {
+      const userID = 'exampleUser';
+      const user = {
+        savedScholarship: [1, 2],
+      };
+      User.findOne.mockResolvedValue(user);
+      Scholarship.find.mockResolvedValue([]);
+  
+      const response = await request(app).get(`/${userID}/fav-scholarships`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "fail to get scholarships from DB", null)
       );
     });
 

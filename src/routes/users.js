@@ -150,9 +150,8 @@ router.put('/:userID/change-pw', async (req, res) => {
         }
 
         if (!user.verifyCode || !user.verifyCodeCreatedAt || user.verifyCode != verifyCode) {
-            return res.status(404).json(createResponse(false, "verificataion code is wrong", null));
+            return res.status(404).json(createResponse(false, "verification code is wrong", null));
         }
-
 
         await User.findOneAndUpdate({ userID: userID }, { userPassword: updatePassword });
 
@@ -256,7 +255,7 @@ router.get('/:userID/fav-scholarships', async (req, res) => {
         const savedScholarshipIDs = (user.savedScholarship || []).map(id => Number(id));
         // Get saved scholarships from the database
         const scholarships = await Scholarship.find({ _id: { $in: savedScholarshipIDs } });
-        if (!scholarships) {
+        if (!scholarships || scholarships.length == 0) {
             return res.status(404).json(createResponse(false, "fail to get scholarships from DB", null));
         }
 
