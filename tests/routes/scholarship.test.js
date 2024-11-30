@@ -118,7 +118,29 @@ describe('Scholarship Routes', () => {
       );
     });
 
-    
+    it('should handle user not found', async () => {
+      const scholarshipID = 1;
+      const userID = 'nonexistentUser';
+  
+      User.findOne.mockResolvedValue(null);
+  
+      Scholarships.findOneAndUpdate.mockResolvedValue({
+        _id: 1,
+        title: 'Scholarship 1',
+      });
+  
+      console.error = jest.fn();
+      const response = await request(app).get(`/${scholarshipID}`).query({ userID });
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "Succesfuly return data", {
+          _id: 1,
+          title: 'Scholarship 1',
+        })
+      );
+  
+      expect(console.error).toHaveBeenCalledWith(`Can't find user who userID: ${userID}`);
+    });
 
     it('should handle scholarship not found', async () => {
       const scholarshipID = 1;
