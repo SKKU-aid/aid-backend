@@ -63,9 +63,9 @@ async function sendUpdatedSavedScholarships() {
 }
 
 //execute function everyday at 22:00
-// cron.schedule('0 22 * * *', sendUpdatedSavedScholarships);
+cron.schedule('0 22 * * *', sendUpdatedSavedScholarships);
 
 //execute this function every one minute (for testing)
-cron.schedule('* * * * *', sendUpdatedSavedScholarships);
+// cron.schedule('* * * * *', sendUpdatedSavedScholarships);
 
 module.exports = sendUpdatedSavedScholarships;
