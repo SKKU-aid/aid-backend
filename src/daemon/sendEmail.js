@@ -1,14 +1,6 @@
 const nodemailer = require('nodemailer')
 require('dotenv').config()
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.user,
-        pass: process.env.pass,
-    },
-});
-
 const getScholarshipsContent = (data) => {
     return (
         data.map(scholarship => `
@@ -47,27 +39,41 @@ const getEmailContent = (type, data) => {
                 .join('\n')
             };
         case 'sendMatchingScholarships':
-            subject = 'Updated Info on Recommended Scholarships';
-            commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
-
-        case 'sendSavedScholarshipsBeforeDeadline':
-            subject = 'The deadline for your saved scholarship is approaching';
-            commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
-        
-        case 'sendUpdatedSavedScholarships':
-            subject = 'Updated Info for your saved Scholarships';
-            commonMessage = 'There is updated information regarding the saved scholarship.\n\n';
-
-        default:
+            const subjectMatching = 'Updated Info on Recommended Scholarships';
+            const commonMessageMatching = 'There is updated information regarding the recommended scholarship.\n\n';
             return {
-                subject: subject,
-                text: commonMessage + getScholarshipsContent(data)
+                subject: subjectMatching,
+                text: commonMessageMatching + getScholarshipsContent(data)
             };
+        case 'sendSavedScholarshipsBeforeDeadline':
+            const subjectDeadline = 'The deadline for your saved scholarship is approaching';
+            const commonMessageDeadline = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
+            return {
+                subject: subjectDeadline,
+                text: commonMessageDeadline + getScholarshipsContent(data)
+            };
+        case 'sendUpdatedSavedScholarships':
+            const subjectUpdated = 'Updated Info for your saved Scholarships';
+            const commonMessageUpdated = 'There is updated information regarding the saved scholarship.\n\n';
+            return {
+                subject: subjectUpdated,
+                text: commonMessageUpdated + getScholarshipsContent(data)
+            };
+        default:
+            throw new Error(`Unknown email type: ${type}`);
     }
 };
 
 // data {email, type, content}
 const sendEmailNotification = (data) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.user,
+            pass: process.env.pass,
+        },
+    });
+    
     const mail_data = getEmailContent(data.type, data.content);
     const mailOptions = {
         from: process.env.user,
@@ -86,4 +92,5 @@ const sendEmailNotification = (data) => {
     });
 };
 
-module.exports = sendEmailNotification
+module.exports = sendEmailNotification;
+module.exports.getScholarshipsContent = getScholarshipsContent;

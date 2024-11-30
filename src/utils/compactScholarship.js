@@ -1,5 +1,3 @@
-
-
 function compactScholarship(scholarship, savedScholarshipIDs = []) {
     const scholarshipID = scholarship._id;
     return {

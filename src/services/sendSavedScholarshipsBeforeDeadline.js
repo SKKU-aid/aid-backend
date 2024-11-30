@@ -6,8 +6,7 @@ const CompactScholarship = require('../models/CompactScholarship.js');
 const createResponse = require('../utils/responseTemplate.js');
 const createListResponse = require('../utils/responseListTemplate.js');
 const compactScholarship = require('../utils/compactScholarship.js');
-const sendEmailNotification = require('../daemon/sendEmail.js');
-
+const sendEmailNotification = require('../../src/daemon/sendEmail.js');
 
 async function sendSavedScholarshipsBeforDeadline() {
     const today = new Date();
@@ -23,7 +22,7 @@ async function sendSavedScholarshipsBeforDeadline() {
 
             //return Scholarships that saved and below 3 days left to Deadline
             const filteredScholarships = scholarships.filter(scholarship => {
-                const isSaved = user.savedScholarship.includes(scholarship._id);
+                const isSaved = user.savedScholarship.includes(Number(scholarship._id));
                 if (!scholarship.applicationPeriod) {
                     return false;
                 }

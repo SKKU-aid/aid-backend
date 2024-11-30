@@ -5,6 +5,8 @@ skku_notice/parsing/*.json
 skku_notice/*.json
 
 Backend/skku_notice/*.json
+tests/dump
+tests/copy_atlas_db.sh
 
 ### Java ###
 # Compiled class file

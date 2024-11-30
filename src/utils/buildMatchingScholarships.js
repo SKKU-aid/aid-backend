@@ -1,5 +1,3 @@
-
-
 function buildMatchingScholarships(user) {
     return function (scholarship) {
         // eligibleMajors

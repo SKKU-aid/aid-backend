@@ -29,11 +29,12 @@ describe('POST / (Login Route)', () => {
     it('should return 404 if password is incorrect', async () => {
         // Mock User.findOne to return a user
         User.findOne.mockResolvedValue({
-            userID: 'example1@skku.edu'
+            userID: 'example1',
+            userPassword: '1398',
         });
 
         const response = await request(app).post('/').send({
-            userID: 'example1@skku.edu',
+            userID: 'example1',
             userPassword: '1234',
         });
 
@@ -44,18 +45,18 @@ describe('POST / (Login Route)', () => {
     it('should return 200 and success response if login is successful', async () => {
         // Mock User.findOne to return a valid user
         User.findOne.mockResolvedValue({
-            userID: 'example1@skku.edu',
+            userID: 'example1',
             userPassword: '1398',
         });
 
         const response = await request(app).post('/').send({
-            userID: 'example1@skku.edu',
+            userID: 'example1',
             userPassword: '1398',
         });
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(
-            createResponse(true, "Log in successfully", { userID: 'example1@skku.edu' })
+            createResponse(true, "Log in successfully", { userID: 'example1' })
         );
     });
 
@@ -66,7 +67,7 @@ describe('POST / (Login Route)', () => {
         });
 
         const response = await request(app).post('/').send({
-            userID: 'example1@skku.edu',
+            userID: 'example1',
             userPassword: '1398',
         });
 

@@ -26,7 +26,9 @@ async function sendUpdatedSavedScholarships() {
             //return Scholarships that saved and below 3 days left to Deadline
             const filteredScholarships = scholarships.filter(scholarship => {
                 const isSaved = user.savedScholarship.includes(scholarship._id);
-                const isUpdated = scholarship.lastUploadedDate !== null && scholarship.lastUploadedDate !== scholarship.uploadedDate;
+                const isUpdated = 
+                    scholarship.lastUploadedDate !== null && 
+                    scholarship.lastUploadedDate.getTime() !== scholarship.uploadedDate.getTime();
                 // Return true if scholarship is saved and due date is within 3 days
                 return isSaved && isUpdated
             });
