@@ -1,5 +1,3 @@
-// tests/services/sendUpdatedSavedScholarships.test.js
-
 const User = require('../../src/models/User');
 const Scholarships = require('../../src/models/Scholarship');
 const sendEmailNotification = require('../../src/daemon/sendEmail');
