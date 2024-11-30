@@ -1,14 +1,6 @@
 const nodemailer = require('nodemailer')
 require('dotenv').config()
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.user,
-        pass: process.env.pass,
-    },
-});
-
 const getScholarshipsContent = (data) => {
     return (
         data.map(scholarship => `
@@ -68,6 +60,14 @@ const getEmailContent = (type, data) => {
 
 // data {email, type, content}
 const sendEmailNotification = (data) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.user,
+            pass: process.env.pass,
+        },
+    });
+    
     const mail_data = getEmailContent(data.type, data.content);
     const mailOptions = {
         from: process.env.user,
