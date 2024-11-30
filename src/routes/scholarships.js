@@ -70,8 +70,8 @@ router.get('/:scholarshipID', async (req, res) => {
             { new: true }
         );
         if (!scholarship) {
-            console.log(`scholarshipID: ${scholarship._id} doesn't exist`);
-            return res.status(404).json(createResponse(false, `scholarshipID: ${scholarship._id} doesn't exist`, null));
+            console.log(`scholarshipID: ${scholarshipID} doesn't exist`);
+            return res.status(404).json(createResponse(false, `scholarshipID: ${scholarshipID} doesn't exist`, null));
         }
 
         // Return data
