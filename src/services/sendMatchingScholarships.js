@@ -7,7 +7,7 @@ const createResponse = require('../utils/responseTemplate.js');
 const createListResponse = require('../utils/responseListTemplate.js');
 const compactScholarship = require('../utils/compactScholarship.js');
 const buildMatchingScholarships = require('../utils/buildMatchingScholarships.js');
-const sendEmailNotification=require('../daemon/sendEmail.js');
+const sendEmailNotification = require('../daemon/sendEmail.js');
 
 async function sendMatchingScholarships() {
     const today = new Date();
@@ -29,7 +29,7 @@ async function sendMatchingScholarships() {
         });
 
         for (const user of users) {
-            console.log('User Email:', user.userID);
+            console.log('User Email:', user.userEmail);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const matchingScholarships = recentlyUploadedScholarships.filter(buildMatchingScholarships(user));
@@ -37,8 +37,8 @@ async function sendMatchingScholarships() {
             console.log('matchingScholarships:', matchingScholarships);
             //Todo
             //Send Email to user, Use matchingScholarships for implementation
-            if (matchingScholarships.length !==  0) {
-                sendEmailNotification({ email: user.userID, type: 'sendMatchingScholarships', content: matchingScholarships });
+            if (matchingScholarships.length !== 0) {
+                sendEmailNotification({ email: user.userEmail, type: 'sendMatchingScholarships', content: matchingScholarships });
             }
         }
     } catch (error) {
@@ -48,7 +48,7 @@ async function sendMatchingScholarships() {
 }
 
 //execute function every 3 days at 22:00
-cron.schedule('0 22 */3 * *',sendMatchingScholarships);
+cron.schedule('0 22 */3 * *', sendMatchingScholarships);
 
 //execute this function every one minute (for testing)
 // cron.schedule('* * * * *', sendMatchingScholarships);

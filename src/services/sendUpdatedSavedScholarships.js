@@ -21,7 +21,7 @@ async function sendUpdatedSavedScholarships() {
 
         let updatedScholarships = new Set();
         for (const user of users) {
-            console.log('User Email:', user.userID);
+            console.log('User Email:', user.userEmail);
 
             //return Scholarships that saved and below 3 days left to Deadline
             const filteredScholarships = scholarships.filter(scholarship => {
@@ -37,16 +37,18 @@ async function sendUpdatedSavedScholarships() {
             });
 
             //Send Email to user, Use filteredScholarships for implementation
-            if (filteredScholarships.length !==  0) {
-                sendEmailNotification({ email: user.userID, type: 'sendUpdatedSavedScholarships', content: filteredScholarships });
+            if (filteredScholarships.length !== 0) {
+                sendEmailNotification({ email: user.userEmail, type: 'sendUpdatedSavedScholarships', content: filteredScholarships });
             }
         }
 
         //if updatedScholarships exist update DB
-        if(updatedScholarships.size>0){
-            const updateResult=await Scholarships.updateMany(
-                {_id:{$in: Array.from(updatedScholarships)}},
-                {$set:{lastUploadedDate:"$uploadedDate"}}
+        if (updatedScholarships.size > 0) {
+            const updateResult = await Scholarships.updateMany(
+                { _id: { $in: Array.from(updatedScholarships) } },
+                [
+                    { $set: { lastUploadedDate: "$uploadedDate" } }
+                ]
             )
             console.log(`${updateResult.modifiedCount} scholarships updated successfully.`);
         }
@@ -61,9 +63,9 @@ async function sendUpdatedSavedScholarships() {
 }
 
 //execute function everyday at 22:00
-cron.schedule('0 22 * * *', sendUpdatedSavedScholarships);
+// cron.schedule('0 22 * * *', sendUpdatedSavedScholarships);
 
 //execute this function every one minute (for testing)
-// cron.schedule('* * * * *', sendUpdatedSavedScholarships);
+cron.schedule('* * * * *', sendUpdatedSavedScholarships);
 
 module.exports = sendUpdatedSavedScholarships;
