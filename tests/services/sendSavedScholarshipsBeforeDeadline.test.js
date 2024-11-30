@@ -18,9 +18,9 @@ describe('sendSavedScholarshipsBeforeDeadline', () => {
   it('should send emails to users with saved scholarships about to expire', async () => {
     const today = new Date();
     const twoDaysLater = new Date(today);
-    twoDaysLater.setDate(today.getDate() + 2);
+    twoDaysLater.setDate(today.getDate() + 1);
     const fourDaysLater = new Date(today);
-    fourDaysLater.setDate(today.getDate() + 4);
+    fourDaysLater.setDate(today.getDate() + 2);
 
     const users = [
       { userEmail: 'user1@example.com', savedScholarship: [1, 2] },
