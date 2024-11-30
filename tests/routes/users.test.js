@@ -211,6 +211,25 @@ describe('User Routes', () => {
         createResponse(false, "Failed to retrieve user", null)
       );
     });
+
+    it('should return 404 if user not found', async () => {
+      const userID = 'nonexistentUser';
+      const verifyCode = '123456';
+      const requestBody = { userID, verifyCode };
+  
+      User.findOne.mockResolvedValue(null);
+  
+      console.error = jest.fn();
+  
+      const response = await request(app).post(`/${userID}/check-verify`).send(requestBody);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual(
+        createResponse(false, "userID doesn't exist in DB", null)
+      );
+  
+      expect(console.error).toHaveBeenCalledWith(`User with user_id: ${userID} doesn't exist`);
+    });
   });
 
   describe('PUT /:userID/change-pw', () => {
