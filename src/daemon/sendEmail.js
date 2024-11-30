@@ -27,6 +27,9 @@ const getScholarshipsContent = (data) => {
 // const subject = "SKKU Scholarship Verification Code";
 // const text = "인증 번호를 입력하십시오.\n인증 번호:\n" + verifyCode;
 const getEmailContent = (type, data) => {
+    let subject;
+    let commonMessage;
+
     switch(type) {
         case 'verification':
             return {
@@ -41,21 +44,24 @@ const getEmailContent = (type, data) => {
         case 'sendMatchingScholarships':
             subject = 'Updated Info on Recommended Scholarships';
             commonMessage = 'There is updated information regarding the recommended scholarship.\n\n';
-
+            break;
         case 'sendSavedScholarshipsBeforeDeadline':
             subject = 'The deadline for your saved scholarship is approaching';
             commonMessage = 'There are 3 days left until the deadline for the saved scholarship.\n\n';
-        
+            break;
         case 'sendUpdatedSavedScholarships':
             subject = 'Updated Info for your saved Scholarships';
             commonMessage = 'There is updated information regarding the saved scholarship.\n\n';
-
+            break;
         default:
-            return {
-                subject: subject,
-                text: commonMessage + getScholarshipsContent(data)
-            };
+            subject = 'Default Subject';
+            commonMessage = '';
     }
+
+    return {
+        subject: subject,
+        text: commonMessage + getScholarshipsContent(data)
+    };
 };
 
 // data {email, type, content}
