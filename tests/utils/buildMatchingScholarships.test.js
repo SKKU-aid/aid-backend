@@ -35,6 +35,18 @@ describe('buildMatchingScholarships', () => {
     expect(matcher(baseScholarship)).toBe(false);
   });
 
+  it('should return true when minimumGPARequirement is null ', () => {
+    const scholarship = { ...baseScholarship, minimumGPARequirement:null };
+    const matcher = buildMatchingScholarships(baseUser);
+    expect(matcher(scholarship)).toBe(true);
+  });
+
+  it('should return true when compare lastGPA ', () => {
+    const scholarship = { ...baseScholarship, compTotalGPA:false };
+    const matcher = buildMatchingScholarships(baseUser);
+    expect(matcher(scholarship)).toBe(true);
+  });
+
   it('should return false when GPA is below requirement', () => {
     const user = { ...baseUser, totalGPA: 3.0 };
     const matcher = buildMatchingScholarships(user);
