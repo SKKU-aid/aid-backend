@@ -53,6 +53,33 @@ describe('Scholarship Routes', () => {
       );
     });
 
+    it('should handle when user.savedScholarship is undefined', async () => {
+      const userID = 'exampleUser';
+    
+      User.findOne.mockResolvedValue({});
+    
+      Scholarships.find.mockResolvedValue([
+        { _id: 1, title: 'Scholarship 1' },
+        { _id: 2, title: 'Scholarship 2' },
+      ]);
+    
+      compactScholarship.mockImplementation((scholarship, savedScholarshipIDs) => ({
+        _id: scholarship._id,
+        title: scholarship.title,
+        isFav: false,
+      }));
+    
+      const response = await request(app).get('/').query({ userID });
+    
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "Succesfuly return data", [
+          { _id: 1, title: 'Scholarship 1', isFav: false },
+          { _id: 2, title: 'Scholarship 2', isFav: false },
+        ])
+      );
+    });    
+
     it('should handle user not found', async () => {
       const userID = 'nonexistentUser';
 
@@ -117,6 +144,28 @@ describe('Scholarship Routes', () => {
         })
       );
     });
+
+    it('should handle when user.savedScholarship is undefined', async () => {
+      const scholarshipID = 1;
+      const userID = 'exampleUser';
+    
+      User.findOne.mockResolvedValue({});
+    
+      Scholarships.findOneAndUpdate.mockResolvedValue({
+        _id: 1,
+        title: 'Scholarship 1',
+      });
+    
+      const response = await request(app).get(`/${scholarshipID}`).query({ userID });
+    
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        createResponse(true, "Succesfuly return data", {
+          _id: 1,
+          title: 'Scholarship 1',
+        })
+      );
+    });    
 
     it('should handle user not found', async () => {
       const scholarshipID = 1;
