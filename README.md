@@ -50,6 +50,37 @@ Below are the steps to run both the API server and the MongoDB service in a Dock
 
 For detailed instructions on how to scrape and parse data, please refer to the [skku_notice/README.md](./skku_notice/README.md).
 
+## How to Test
+
+Follow these steps to run the tests included in the project:
+
+1. **Set Up the Environment**  
+   Ensure that your `.env` file is properly configured as described in the **How to Run** section.
+
+2. **Install Dependencies**  
+   If you haven’t already installed the required dependencies, run:
+   ```bash
+   npm install
+   ```
+
+3. **Run Tests**  
+   Use the following command to execute all test cases:
+   ```bash
+   npm test
+   ```
+   This will run the tests located in the `tests` directory. The test results will be displayed in the terminal.
+
+4. **Check Individual Tests**  
+   To run specific test files, use:
+   ```bash
+   npm test <test-file-name>
+   ```
+   Replace `<test-file-name>` with the actual test file path, e.g., `tests/api.test.js`.
+
+5. **Verify Test Results**  
+   - **Success**: If all tests pass, you will see a summary indicating success.
+   - **Failure**: If any tests fail, review the error messages and debug the corresponding test cases or implementation.
+
 ## Backend Developer
 
 2024 Fall SKKU SE CLASS 42 TEAM 10 Backend developer
