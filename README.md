@@ -1,42 +1,54 @@
-# 스꾸장학비서
+# SKKU Scholarship Assistant (스꾸장학비서)
 
 ## Overview
-TBD
+SKKU Scholarship Assistant is a project designed to make it easier for Sungkyunkwan University (SKKU) students to gather and check scholarship-related notices and announcements.  
+- **Scholarship Notice Scraping**: Automatically collects scholarship notices and announcements from SKKU using Scrapy.  
+- **Data Storage**: Stores collected data in MongoDB for efficient retrieval.  
+- **Backend API**: Provides a RESTful API built with Node.js so that users can easily query scholarship information.  
+- **Scalability**: Uses Docker for convenient deployment and management.
 
 ## How to Run
 
-Follow these steps to set up and run the API and MongoDB servers in Docker.
+Below are the steps to run both the API server and the MongoDB service in a Docker environment:
 
-1. Open a terminal in the project directory and run the following command to start all containers in the background:
-    ```bash
-    docker exec -it backend bash
-    ```
+1. **Create and Configure the `.env` File**  
+   In the project’s root directory, create a `.env` file containing the following:
+   ```bash
+   MONGODB_URI=mongodb://<user>:<password>@localhost:27017/<database>
+   ```
+   - Replace `<user>`, `<password>`, and `<database>` with your actual credentials.  
+   - If you’re unsure about the details of the `MONGODB_URI`, please contact the project contributor.
 
-2. Install Dependencies in the Backend Container
-    ```bash
-    npm install
-    ```
+2. **Start Docker Containers**  
+   ```bash
+   docker-compose up -d
+   ```
+   - The `-d` option runs the containers in the background.  
+   - Once the command completes, you can verify the containers are running by using:
+     ```bash
+     docker-compose ps
+     ```
 
-3. Start the API Server. In the backend container, start the API server by running:
-    ```bash
-    node app.js
-    ```
+3. **Access the Backend Container**  
+   ```bash
+   docker exec -it backend bash
+   ```
 
-4. Once the API server is running, you can access it at [http://localhost:8082](http://localhost:8082) in your web browser.
+4. **Install Dependencies**  
+   Inside the backend container, run:
+   ```bash
+   npm install
+   ```
 
-5. In the project directory, ensure you have a .env file containing the following:
-    ```bash
-    MONGODB_URI=mongodb://<user>:<password>@localhost:27017/<database>
-    ```
-    Replace <user>, <password>, and <database> with the appropriate values. If you're unsure about the MONGODB_URI details, please contact the contributor for assistance.
+5. **Start the API Server**  
+   ```bash
+   node app.js
+   ```
+   - If the server starts correctly, you can access it in your web browser at [http://localhost:8082](http://localhost:8082).
 
 ## How to Use Scrapy and Parsing
 
 For detailed instructions on how to scrape and parse data, please refer to the [skku_notice/README.md](./skku_notice/README.md).
-
-
-## License
-TBD
 
 ## Backend Developer
 
