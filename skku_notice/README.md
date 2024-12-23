@@ -20,6 +20,29 @@ chmod +x crawl_script.sh
 ```
 The scraped results will be stored in `notices.json`.
 
+**Common Issue: "cannot execute: required file not found"**  
+If you encounter the following error when running `./crawl_script.sh`:
+```bash
+bash: ./crawl_script.sh: cannot execute: required file not found
+```
+It is likely due to CRLF (Windows-style line endings) in the script file. Follow these steps to fix the issue:
+
+1. Open the file in `vim`:
+   ```bash
+   vim crawl_script.sh
+   ```
+
+2. Convert the line endings to LF (Unix-style):
+   ```vim
+   :set fileformat=unix
+   :wq
+   ```
+   
+3. Re-run the script:
+   ```bash
+   ./crawl_script.sh
+   ```
+
 ---
 
 ## How to Use LangChain for Parsing
@@ -28,7 +51,7 @@ The scraped results will be stored in `notices.json`.
    - Make sure it contains valid API keys for LangChain or any other LLM services.  
    - Ensure the MongoDB URI matches the one mentioned in the [../README.md](../README.md).
    - If you do not have the necessary keys, please contact the project administrator.
-   - Below is an example .env structure:
+   - Below is an example `.env` structure:
      ```bash
      # .env
      OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
