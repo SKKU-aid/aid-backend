@@ -7,6 +7,11 @@ SKKU Scholarship Assistant is a project designed to make it easier for Sungkyunk
 - **Backend API**: Provides a RESTful API built with Node.js so that users can easily query scholarship information.  
 - **Scalability**: Uses Docker for convenient deployment and management.
 
+## Tech Stack
+|<img src="https://github.com/user-attachments/assets/1066d233-a18e-45e5-93bd-6c5c8c0b6dc3" height=100px>|<img src="https://github.com/user-attachments/assets/f1f417f9-7cc5-441c-90cd-83d62763b69a" height=100px>|<img src="https://github.com/user-attachments/assets/9506f682-d983-4437-886f-6f715544ef99" height=100px>|<img src="https://github.com/user-attachments/assets/df3735cd-76d9-4986-93d8-7a57bac3cf36" height=100px>|
+|:--:|:--:|:--:|:--:|
+|Node.js|Scrapy|MongoDB|LangChain|
+
 ## How to Run
 
 Below are the steps to run both the API server and the MongoDB service in a Docker environment:
