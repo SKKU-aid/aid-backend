@@ -93,8 +93,8 @@ Follow these steps to run the tests included in the project:
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/JihunSKKU">
-        <img src="https://github.com/JihunSKKU.png" width="60px;" alt="JihunSKKU"/>
+      <a href="https://github.com/DevJihun">
+        <img src="https://github.com/DevJihun.png" width="60px;" alt="DevJihun"/>
         <br />
         <sub><b>Jihun Kim</b></sub>
       </a>
@@ -115,3 +115,4 @@ Follow these steps to run the tests included in the project:
     </td>
   </tr>
 </table>
+
